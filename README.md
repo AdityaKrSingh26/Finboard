@@ -2,11 +2,11 @@
 
 A real-time finance monitoring dashboard built with Next.js that allows users to create customizable widgets for tracking stocks, cryptocurrency, and market data from multiple financial APIs.
 
-## 🚀 Live Demo
+## Live Demo
 
 [Live Link](https://finboard-nine.vercel.app/)
 
-## 📋 Assignment Overview
+## Assignment Overview
 
 This project was developed as part of the **Groww Web Intern Assignment** - a customizable finance dashboard that enables users to build their own real-time finance monitoring dashboard by connecting to various financial APIs and displaying data through customizable widgets.
 
@@ -14,11 +14,11 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 
 ---
 
-## ✨ Implemented Features
+## Implemented Features
 
-### 🎯 Core Features (Completed)
+### Core Features (Completed)
 
-#### 1. **Widget Management System** ✅
+#### 1. **Widget Management System**
 - **Add Widgets**: Create finance data widgets by connecting to financial APIs
   - **Table Widgets**: Paginated stock/crypto data with filters and search
   - **Finance Cards**: Watchlist, market gainers, performance metrics
@@ -27,7 +27,7 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 - **Drag & Drop Rearrangement**: Reorder widgets with smooth animations
 - **Widget Configuration**: Comprehensive settings panel for each widget
 
-#### 2. **API Integration & Data Handling** ✅
+#### 2. **API Integration & Data Handling**
 - **Multiple Financial APIs**:
   - Finnhub (Stock market data)
   - Alpha Vantage (Stock quotes and company profiles)
@@ -38,40 +38,40 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 - **Data Caching**: Intelligent caching to optimize API calls
 - **Error Handling**: Comprehensive error states and retry mechanisms
 
-#### 3. **User Interface & Experience** ✅
+#### 3. **User Interface & Experience**
 - **Responsive Design**: Fully responsive across desktop, tablet, and mobile
 - **Dark/Light Theme**: Dynamic theme switching with system preference detection
 - **Loading States**: Skeleton loaders and loading indicators
 - **Empty States**: Intuitive onboarding and template suggestions
 - **Search & Filter**: Real-time widget search functionality
 
-#### 4. **Data Persistence** ✅
+#### 4. **Data Persistence**
 - **Browser Storage**: Complete dashboard state persisted in localStorage
 - **State Recovery**: Full dashboard restoration on page refresh
 - **Widget Configuration Backup**: All settings and layouts saved
 
-#### 5. **Advanced Widget Features** ✅
+#### 5. **Advanced Widget Features**
 - **Field Selection Interface**: Interactive JSON explorer for API responses
 - **Custom Formatting**: Currency, percentage, and number formatting
 - **Widget Naming**: User-defined titles and descriptions
 - **Multiple Data Sources**: Easy switching between API endpoints
 
-### 🏆 Bonus Features (Implemented)
+### Bonus Features (Implemented)
 
-#### 1. **Dynamic Theme Switching** ✅
+#### 1. **Dynamic Theme Switching**
 - Seamless light/dark mode toggle
 - System preference detection
 - Persistent theme settings
 - Smooth transitions between themes
 
-#### 2. **Dashboard Templates** ✅
+#### 2. **Dashboard Templates**
 - **Stock Trader Template**: Live quotes, charts, and market summary
 - **Crypto Tracker Template**: Cryptocurrency price tracking
 - **Market Overview Template**: Quick market conditions overview
 - **Template Categories**: Organized template library
 - **One-click Apply**: Instant dashboard setup
 
-#### 3. **Enhanced State Management** ✅
+#### 3. **Enhanced State Management**
 - Redux Toolkit for complex application state
 - Optimized widget data management
 - Efficient re-rendering strategies
@@ -79,7 +79,7 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend Framework
 - **Next.js 15.5.2** - React framework with App Router
@@ -105,7 +105,7 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 ### Deployment
 - **Vercel** - Optimized for Next.js applications
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 finboard/
@@ -164,7 +164,7 @@ finboard/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+ 
@@ -223,7 +223,7 @@ finboard/
 
 ---
 
-## 🐛 Known Issues & Limitations
+## Known Issues & Limitations
 
 ### API Limitations
 - **Rate Limits**: Free tier APIs have request limitations
@@ -234,7 +234,7 @@ finboard/
 - **Mobile Performance**: Large datasets may impact mobile performance
 - **Real-time Updates**: Currently polling-based, not true real-time
 
-## 📞 Contact
+## Contact
 
 **Aditya Kumar Singh**
 - Email: singh.adityakr26@gmail.com
