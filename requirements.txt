@@ -1,0 +1,204 @@
+FinBoard 
+FRONT-END ASSIGNMENT ROUND 
+Problem Statement 
+Create a Customizable Finance Dashboard where users can build their 
+own real-time finance monitoring dashboard by connecting to various 
+financial APIs and displaying real-time data through customizable 
+widgets. 
+Objectives 
+1. Develop a user-friendly finance dashboard builder that 
+supports real-time data visualization. 
+2. Enable seamless integration with multiple financial APIs 
+(stocks). 
+3. Provide intuitive widget management with drag-and-drop 
+functionality. 
+4. Implement robust state management and data persistence 
+capabilities. 
+Technologies 
+• Frontend Framework:Next.js  
+• Styling: CSS, Tailwind CSS, Styled-Components  
+• State Management: Redux/Redux Toolkit, Zustand, Jotai  
+• Data Visualization: Chart.js, Recharts, or similar charting 
+libraries  
+• Deployment: Vercel, Netlify, or AWS 
+Features 
+1. Widget Management System: 
+○ Add Widgets: Users can create new finance data widgets by 
+connecting to any financial API- 
+● Table: A paginated list or grid of stocks with filters 
+and search functionality. 
+● Finance Cards: A list or single card view for: 
+○ Watchlist 
+○ Market Gainers 
+○ Performance Data 
+○ Financial Data 
+● Charts: Candle or Line graphs showing stock prices over 
+different intervals (Daily, Weekly, Monthly) 
+○ Remove Widgets: Easy deletion of unwanted widgets from the 
+dashboard 
+○ Rearrange Layout: Drag-and-drop functionality to reorganize 
+widget positions on the dashboard 
+○ Widget Configuration: Each widget includes a configuration panel 
+for customization 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2. API Integration & Data Handling: 
+○ Dynamic Data Mapping: Users can explore API responses and select 
+specific fields to display 
+○ Real-time Updates: Automatic data refresh with configurable 
+intervals 
+○ Data Caching: Intelligent caching system to optimize API calls 
+and reduce redundant requests 
+3. User Interface & Experience: 
+○ Customizable Widgets: Each widget displays as a finance card with 
+editable titles and selected metrics 
+○ Responsive Design: Fully responsive layout supporting multiple 
+screen sizes 
+○ Loading & Error States: Comprehensive handling of loading, error, 
+and empty data states 
+4. Data Persistence: 
+○ Browser Storage Integration: All widget configurations and 
+dashboard layouts persist across sessions 
+○ State Recovery: Complete dashboard restoration upon page refresh 
+or browser restart 
+○ Configuration Backup: Export/import functionality for dashboard 
+configurations 
+5. Advanced Widget Features: 
+○ Field Selection Interface: Interactive JSON explorer for choosing 
+display fields 
+○ Custom Formatting: Support for different data formats (currency, 
+percentage, etc.) 
+○ Widget Naming: User-defined widget titles and descriptions 
+○ API Endpoint Management: Easy switching between different API 
+endpoints per widget 
+API Integration Guidelines 
+• Use reliable financial APIs (Alpha Vantage, Finnhub,  IndianAPI 
+etc.)  
+• You'll need an API key to access the endpoints. Generate an API 
+key for the app and check the limits on requests per minute and 
+requests per day. 
+• Implement proper API key management and security practices  
+• Handle rate limiting and API quota management gracefully  
+Technical Requirements 
+• Follow a well-defined, scalable folder structure  
+• Write clean, maintainable, and well-documented code 
+• Optimize for performance with lazy loading, code splitting, 
+rendering strategies (CSR/SSR) 
+Brownie Points  
+Note: Focus on core functionality first. Once basic features are 
+working, explore these advanced features: 
+1. Dynamic Theme Switching: Implement a dynamic theme-switching 
+feature that allows users to toggle between Light and Dark 
+modes seamlessly. 
+2. Real-time data: Implement sockets for live data updates over 
+widget. 
+3. Dashboard Templates: Pre-built dashboard templates for  
+Evaluation Criteria 
+This assignment evaluates:  
+• Frontend Development Skills: React proficiency, component 
+architecture, and modern JavaScript  
+• State Management: Effective use of Redux/Zustand for complex 
+application state  
+• API Integration: Handling dynamic JSON data and implementing 
+robust data fetching strategies 
+• User Experience Design: Creating intuitive interfaces that 
+non-technical users can navigate easily 
+• Problem-Solving Ability: Implementing flexible solutions for 
+diverse API structures and data formats  
+• Code Quality: Clean, maintainable, and scalable code architecture 
+FAQ 
+API and Data Handling 
+Q: How do I handle different API response formats? 
+A: Implement a flexible data mapper that can handle various JSON 
+structures. Consider creating adapters for common API formats. 
+Q: What happens if the API request limit is reached? 
+A: If the API request limit is reached, the website may temporarily 
+stop fetching new data until the limit resets. You may see a message 
+indicating that the API limit has been reached and suggesting you 
+try again later. 
+Q: How do I create a new API key? 
+A: To create a new API key, follow these steps : 
+1. Visit the API provider's website (e.g., Alpha Vantage). 
+2. Sign in to your account or create a new account if you don't 
+have one. 
+3. Navigate to the API section or dashboard. 
+4. Look for an option to generate a new API key. 
+5. Follow the prompts to create and copy the new API key. 
+6. Update your web application's configuration with the new API 
+key. 
+Q: What are common API errors and what should I do when API rate 
+limits are exceeded? 
+A:.Common API errors include exceeding the rate limit, invalid API 
+keys, CORS and network issues. To avoid rate limit cache API 
+responses. Also, each API provider has specific rate limits, which 
+are typically documented on their website. 
+Q: What should I do when API rate limits are exceeded? 
+A:  For support or feedback, you can contact the team through the 
+provided contact information in the email. 
+All the best !! 
+
+
+08/09/2025, 17:05
+ Gmail - Groww | Assignment - Web Intern
+ Aditya Kumar Singh <singh.adityakr26@gmail.com>
+ Groww | Assignment - Web Intern
+ 1 message
+ Sheethal KM <sheethalkm@groww.in>
+ To: Sheethal KM <sheethalkm@groww.in>
+ Hello, 
+Mon, Sep 8, 2025 at 2:48 PM
+ Thank you for showing interest in joining Groww as an Web Intern. We were impressed with your profile and would like
+ to proceed to the next step of the recruitment process. As part of our evaluation process, we would like you to complete a
+ coding assignment that will help us assess your technical skills.
+ Assignment Details:
+ Create a Customizable Finance Dashboard where users can build their own real-time finance monitoring dashboard by
+ connecting to various financial APIs and displaying real-time data through customizable widgets.
+ Note : 
+For more details please refer to the attachment below, let me know if you have any queries.
+ Evaluation Criteria:
+ Correctness and completeness of the solution.
+ Code quality, readability, and adherence to best practices.
+ Efficiency and optimization of algorithms 
+Clear concise documentation.
+ Deadline: 
+The assignment should be completed and submitted within (11th September 2025 by 11:59 PM)
+ Next Steps:
+ Once you have completed the assignment, please respond to this email. Our team will review your assignment and if it
+ meets our criteria, we will schedule a technical round of interview to discuss your solution further.
+ In case you have any questions or need clarification regarding the assignment, feel free to reach out to us. We are here to
+ assist you throughout the process.
+ Thank you once again for considering Groww. We look forward to reviewing your coding assignment and hopefully,
+ welcoming you to our team.-
+Sheethal KM
+ Talent Acquisition 
+8277780155 || Linkedin
+ Disclaimer - The contents of this email message and any attachments
+ are confidential and are intended solely for the addressee. The
+ information may also be legally privileged. This transmission is sent
+ in trust, for the sole purpose of delivery to the intended recipient.
+ If you have received this transmission in error, any use, reproduction
+ or dissemination is strictly prohibited. Please notify the sender
+ immediately by email if you have received this email by mistake and
+ delete this email from your system.
+ Disclaimer - The contents of this email message and any attachments
+ are confidential and are intended solely for the addressee. The
+ information may also be legally privileged. This transmission is sent
+ in trust, for the sole purpose of delivery to the intended recipient.
+ If you have received this transmission in error, any use, reproduction
+ or dissemination is strictly prohibited. Please notify the sender
+ https://mail.google.com/mail/u/0/?ik=dd29aaeb55&view=pt&search=all&permthid=thread-f:1842686856289255637&simpl=msg-f:1842686856289255637
+ 1/2
+08/09/2025, 17:05
+ Gmail - Groww | Assignment - Web Intern
+ immediately by email if you have received this email by mistake and
+ delete this email from your system.
+ FinBoard (1).pdf
+ 1577K
+ 2/2
+ https://mail.google.com/mail/u/0/?ik=dd29aaeb55&view=pt&search=all&permthid=thread-f:1842686856289255637&simpl=msg-f:1842686856289255637

@@ -1,376 +1,137 @@
-import { BaseAPIClient } from './base-client.js'
-import { API_CONFIG, CACHE_CONFIG } from '../config/api-config.js'
+import { API_CONFIG } from '../config/api-config.js'
 
-export class FinnhubClient extends BaseAPIClient {
-	constructor() {
-		super(API_CONFIG.FINNHUB)
-	}
+const BASE_URL = API_CONFIG.FINNHUB.BASE_URL
+const API_KEY = API_CONFIG.FINNHUB.API_KEY
 
-	// Check if response contains API error
-	isErrorResponse(data) {
-		return data.error || (typeof data === 'string' && data.includes('API limit reached'))
-	}
-
-	// Extract error message from API response
-	extractErrorMessage(data) {
-		if (data.error) return data.error
-		if (typeof data === 'string' && data.includes('API limit reached')) {
-			return 'Finnhub API limit reached. Please try again later.'
+// Simple fetch function
+async function fetchData(url) {
+	try {
+		const response = await fetch(url)
+		if (!response.ok) {
+			throw new Error(`API Error: ${response.status}`)
 		}
-		return 'Unknown Finnhub API error'
-	}
-
-	// Get real-time stock quote
-	async getStockQuote(symbol) {
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.QUOTE}`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.SHORT_TTL
-		)
-
-		if (data.c !== undefined) {
-			return {
-				symbol: symbol.toUpperCase(),
-				price: data.c, // Current price
-				change: data.d, // Change
-				change_percent: data.dp, // Percent change
-				high: data.h, // High price of the day
-				low: data.l, // Low price of the day
-				open: data.o, // Open price of the day
-				previous_close: data.pc, // Previous close price
-				timestamp: data.t, // Timestamp
-				last_updated: new Date(data.t * 1000).toISOString(),
-			}
-		}
-
-		throw new Error(`No quote data found for symbol: ${symbol}`)
-	}
-
-	// Get company profile
-	async getCompanyProfile(symbol) {
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.COMPANY_PROFILE}`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.LONG_TTL
-		)
-
-		if (data.name) {
-			return {
-				symbol: symbol.toUpperCase(),
-				name: data.name,
-				country: data.country,
-				currency: data.currency,
-				exchange: data.exchange,
-				ipo: data.ipo,
-				market_capitalization: data.marketCapitalization,
-				phone: data.phone,
-				share_outstanding: data.shareOutstanding,
-				ticker: data.ticker,
-				weburl: data.weburl,
-				logo: data.logo,
-				finnhub_industry: data.finnhubIndustry,
-			}
-		}
-
-		return null
-	}
-
-	// Get multiple stock quotes with company profiles
-	async getEnhancedStockQuotes(symbols) {
-		const enhancedQuotes = []
-
-		for (const symbol of symbols) {
-			try {
-				// Get both quote and profile data
-				const [quote, profile] = await Promise.all([
-					this.getStockQuote(symbol),
-					this.getCompanyProfile(symbol)
-				])
-
-				enhancedQuotes.push({
-					// API response structure fields
-					symbol: symbol.toUpperCase(),
-					c: quote.price, // Current price
-					d: quote.change, // Change
-					dp: quote.change_percent, // Change percent
-					h: quote.high, // High
-					l: quote.low, // Low
-					o: quote.open, // Open
-					pc: quote.previous_close, // Previous close
-					t: quote.timestamp, // Timestamp
-
-					// Profile data with API field names
-					ticker: symbol.toUpperCase(),
-					name: profile?.name || symbol,
-					country: profile?.country || 'US',
-					currency: profile?.currency || 'USD',
-					exchange: profile?.exchange || 'NASDAQ',
-					marketCapitalization: profile?.market_capitalization || null,
-					shareOutstanding: profile?.share_outstanding || null,
-					finnhubIndustry: profile?.finnhub_industry || null,
-
-					// Legacy fields for backward compatibility
-					company: profile?.name || symbol,
-					price: quote.price,
-					change: quote.change,
-					change_percent: quote.change_percent,
-					market_cap: profile?.market_capitalization ? `${(profile.market_capitalization / 1000).toFixed(1)}B` : 'N/A',
-
-					last_updated: new Date().toISOString(),
-				})
-
-				// Add delay to respect rate limits (60 requests/minute)
-				if (symbols.indexOf(symbol) < symbols.length - 1) {
-					await new Promise(resolve => setTimeout(resolve, 1000))
-				}
-			} catch (error) {
-				console.error(`Failed to get enhanced quote for ${symbol}:`, error.message)
-				// Continue with other symbols
-			}
-		}
-
-		return enhancedQuotes
-	}
-
-	// Get historical candle data
-	async getCandleData(symbol, resolution = 'D', from, to) {
-		// Default to last 30 days if no dates provided
-		if (!from || !to) {
-			to = Math.floor(Date.now() / 1000)
-			from = to - (30 * 24 * 60 * 60) // 30 days ago
-		}
-
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.CANDLES}`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			resolution,
-			from: from.toString(),
-			to: to.toString(),
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.MEDIUM_TTL
-		)
-
-		if (data.s === 'ok' && data.c && data.c.length > 0) {
-			const candles = []
-			for (let i = 0; i < data.c.length; i++) {
-				candles.push({
-					timestamp: data.t[i],
-					date: new Date(data.t[i] * 1000).toISOString().split('T')[0],
-					open: data.o[i],
-					high: data.h[i],
-					low: data.l[i],
-					close: data.c[i],
-					volume: data.v[i],
-				})
-			}
-			return candles
-		}
-
-		return []
-	}
-
-	// Get market status
-	async getMarketStatus(exchange = 'US') {
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.MARKET_STATUS}`
-		const params = {
-			exchange,
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.SHORT_TTL
-		)
-
-		return {
-			exchange,
-			is_open: data.isOpen || false,
-			session: data.session || 'unknown',
-			timezone: data.timezone || 'US/Eastern',
-			local_time: data.t ? new Date(data.t * 1000).toISOString() : new Date().toISOString(),
-		}
-	}
-
-	// Get stock news
-	async getStockNews(symbol, from, to) {
-		// Default to last 7 days if no dates provided
-		if (!from || !to) {
-			to = new Date().toISOString().split('T')[0]
-			const fromDate = new Date()
-			fromDate.setDate(fromDate.getDate() - 7)
-			from = fromDate.toISOString().split('T')[0]
-		}
-
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.NEWS}`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			from,
-			to,
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.MEDIUM_TTL
-		)
-
-		if (Array.isArray(data)) {
-			return data.slice(0, 10).map(article => ({
-				id: article.id,
-				headline: article.headline,
-				summary: article.summary,
-				url: article.url,
-				image: article.image,
-				source: article.source,
-				category: article.category,
-				datetime: new Date(article.datetime * 1000).toISOString(),
-				related: article.related || symbol.toUpperCase(),
-			}))
-		}
-
-		return []
-	}
-
-	// Get basic company information
-	async getBasicFinancials(symbol, metric = 'all') {
-		const url = `${this.config.BASE_URL}${this.config.ENDPOINTS.BASIC_FINANCIALS}`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			metric,
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.LONG_TTL
-		)
-
-		if (data.metric) {
-			return {
-				symbol: symbol.toUpperCase(),
-				pe_ratio: data.metric.peBasicExclExtraTTM,
-				market_cap: data.metric.marketCapitalization,
-				enterprise_value: data.metric.enterpriseValue,
-				revenue_ttm: data.metric.revenueTTM,
-				net_income_ttm: data.metric.netIncomeTTM,
-				debt_to_equity: data.metric.totalDebt / data.metric.totalEquity,
-				current_ratio: data.metric.currentRatio,
-				return_on_equity: data.metric.roeTTM,
-				return_on_assets: data.metric.roaTTM,
-				profit_margin: data.metric.netProfitMarginTTM,
-				dividend_yield: data.metric.dividendYieldIndicatedAnnual,
-				beta: data.metric.beta,
-				fifty_two_week_high: data.metric['52WeekHigh'],
-				fifty_two_week_low: data.metric['52WeekLow'],
-			}
-		}
-
-		return {}
-	}
-
-	// Get index constituents (for major indices)
-	async getIndexConstituents(symbol) {
-		const url = `${this.config.BASE_URL}/index/constituents`
-		const params = {
-			symbol: symbol.toUpperCase(),
-			token: this.config.API_KEY
-		}
-
-		const data = await this.makeRequest(
-			url,
-			{ params },
-			true,
-			CACHE_CONFIG.LONG_TTL
-		)
-
-		if (data.constituents && Array.isArray(data.constituents)) {
-			return data.constituents.map(stock => ({
-				symbol: stock.symbol,
-				name: stock.displaySymbol,
-				weight: stock.weight,
-			}))
-		}
-
-		return []
-	}
-
-	// Utility methods for popular data sets
-	async getPopularStocks() {
-		const symbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'NVDA', 'META', 'NFLX']
-		return this.getEnhancedStockQuotes(symbols)
-	}
-
-	async getTechStocks() {
-		const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'NFLX', 'NVDA', 'ADBE', 'CRM', 'ORCL']
-		return this.getEnhancedStockQuotes(symbols)
-	}
-
-	async getDowJones() {
-		const symbols = ['AAPL', 'MSFT', 'UNH', 'GS', 'HD', 'CAT', 'AMGN', 'CRM', 'V', 'BA']
-		return this.getEnhancedStockQuotes(symbols)
-	}
-
-	async getSP500Top() {
-		const symbols = ['AAPL', 'MSFT', 'AMZN', 'NVDA', 'GOOGL', 'TSLA', 'META', 'BRK.B', 'UNH', 'JNJ']
-		return this.getEnhancedStockQuotes(symbols)
-	}
-
-	async getCryptocurrencyStocks() {
-		const symbols = ['COIN', 'MSTR', 'RIOT', 'MARA', 'CLSK', 'HUT', 'BITF', 'CAN']
-		return this.getEnhancedStockQuotes(symbols)
-	}
-
-	// Get API health status
-	async getAPIHealthStatus() {
-		try {
-			const testSymbol = 'AAPL'
-			const quote = await this.getStockQuote(testSymbol)
-
-			return {
-				service: 'Finnhub',
-				status: 'healthy',
-				response_time: Date.now(),
-				last_updated: new Date().toISOString(),
-				sample_data: quote,
-				rate_limit_remaining: this.rateLimiter?.remaining || 'Unknown',
-			}
-		} catch (error) {
-			return {
-				service: 'Finnhub',
-				status: 'error',
-				error: error.message,
-				last_updated: new Date().toISOString(),
-				rate_limit_remaining: this.rateLimiter?.remaining || 'Unknown',
-			}
-		}
+		const data = await response.json()
+		return data
+	} catch (error) {
+		console.error('Fetch error:', error)
+		throw error
 	}
 }
 
-// Create and export a singleton instance
-export const finnhubClient = new FinnhubClient()
+// Get stock quote
+export async function getStockQuote(symbol) {
+	const url = `${BASE_URL}/quote?symbol=${symbol}&token=${API_KEY}`
+	const data = await fetchData(url)
+	
+	return {
+		symbol: symbol,
+		price: data.c,
+		change: data.d,
+		change_percent: data.dp,
+		high: data.h,
+		low: data.l,
+		open: data.o,
+		previous_close: data.pc
+	}
+}
+
+// Get company info
+export async function getCompanyProfile(symbol) {
+	const url = `${BASE_URL}/stock/profile2?symbol=${symbol}&token=${API_KEY}`
+	const data = await fetchData(url)
+	
+	if (data.name) {
+		return {
+			symbol: symbol,
+			name: data.name,
+			country: data.country,
+			currency: data.currency,
+			exchange: data.exchange,
+			logo: data.logo
+		}
+	}
+	return null
+}
+
+// Get multiple stock quotes
+export async function getEnhancedStockQuotes(symbols) {
+	const results = []
+
+	for (const symbol of symbols) {
+		try {
+			const quote = await getStockQuote(symbol)
+			const profile = await getCompanyProfile(symbol)
+
+			results.push({
+				symbol: symbol,
+				name: profile?.name || symbol,
+				price: quote.price,
+				change: quote.change,
+				change_percent: quote.change_percent,
+				market_cap: 'N/A',
+				company: profile?.name || symbol,
+				// Keep the original API field names for compatibility
+				c: quote.price,
+				d: quote.change,
+				dp: quote.change_percent,
+				h: quote.high,
+				l: quote.low,
+				o: quote.open,
+				pc: quote.previous_close
+			})
+
+			// Simple delay to avoid hitting rate limits
+			await new Promise(resolve => setTimeout(resolve, 1000))
+		} catch (error) {
+			console.error(`Error getting data for ${symbol}:`, error)
+		}
+	}
+
+	return results
+}
+
+// Get chart data
+export async function getCandleData(symbol, resolution = 'D') {
+	// Get last 30 days
+	const to = Math.floor(Date.now() / 1000)
+	const from = to - (30 * 24 * 60 * 60)
+
+	const url = `${BASE_URL}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}&token=${API_KEY}`
+	const data = await fetchData(url)
+
+	if (data.s === 'ok' && data.c) {
+		const candles = []
+		for (let i = 0; i < data.c.length; i++) {
+			candles.push({
+				date: new Date(data.t[i] * 1000).toISOString().split('T')[0],
+				open: data.o[i],
+				high: data.h[i],
+				low: data.l[i],
+				close: data.c[i],
+				volume: data.v[i]
+			})
+		}
+		return candles
+	}
+	return []
+}
+
+// Get some popular stocks
+export async function getPopularStocks() {
+	const symbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'NVDA', 'META', 'NFLX']
+	return getEnhancedStockQuotes(symbols)
+}
+
+export async function getTechStocks() {
+	const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'NFLX', 'NVDA', 'ADBE']
+	return getEnhancedStockQuotes(symbols)
+}
+
+export const finnhubClient = {
+	getStockQuote,
+	getCompanyProfile,
+	getEnhancedStockQuotes,
+	getCandleData,
+	getPopularStocks,
+	getTechStocks
+}
