@@ -1,6 +1,7 @@
-// Widget configuration templates based on API data structure analysis
+// Simple widget configurations for dashboard
+// Basic widget templates
 export const WIDGET_CONFIGS = {
-	// Stock Quote Table Configuration
+	// Stock table config
 	stockQuotes: {
 		type: 'table',
 		dataSource: 'stocks',
@@ -19,7 +20,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 30
 	},
 
-	// Company Profile Table Configuration
+	// Company info table config
 	companyProfiles: {
 		type: 'table',
 		dataSource: 'stocks',
@@ -37,7 +38,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 300
 	},
 
-	// Enhanced Stock Table (combines quote + profile data)
+	// Enhanced stock table config
 	enhancedStocks: {
 		type: 'table',
 		dataSource: 'stocks',
@@ -56,7 +57,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 60
 	},
 
-	// Compact Stock Table (key metrics only)
+	// Simple stock table config
 	compactStocks: {
 		type: 'table',
 		dataSource: 'stocks',
@@ -72,7 +73,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 15
 	},
 
-	// Trading-focused Table (OHLC + Volume)
+	// Trading table config
 	tradingView: {
 		type: 'table',
 		dataSource: 'stocks',
@@ -90,7 +91,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 30
 	},
 
-	// Card Widget Configurations
+	// Card widget config
 	marketSummary: {
 		type: 'card',
 		dataSource: 'market_summary',
@@ -98,7 +99,7 @@ export const WIDGET_CONFIGS = {
 		refreshInterval: 60
 	},
 
-	// Chart Widget Configurations
+	// Chart configs
 	stockPriceChart: {
 		type: 'chart',
 		dataSource: 'chart_data',
@@ -110,7 +111,7 @@ export const WIDGET_CONFIGS = {
 
 	stockCandlestickChart: {
 		type: 'chart',
-		dataSource: 'chart_data', 
+		dataSource: 'chart_data',
 		chartType: 'candlestick',
 		timeframe: 'daily',
 		displayFields: ['date', 'open', 'high', 'low', 'close', 'volume'],
@@ -136,7 +137,7 @@ export const WIDGET_CONFIGS = {
 	}
 }
 
-// Configuration mapping for different widget types
+// Widget type names
 export const WIDGET_TYPE_CONFIGS = {
 	'Stock Quotes': 'stockQuotes',
 	'Company Profiles': 'companyProfiles',
@@ -150,7 +151,7 @@ export const WIDGET_TYPE_CONFIGS = {
 	'Market Overview Chart': 'marketOverviewChart'
 }
 
-// Default configuration templates for auto-configuration
+// Default configs for new widgets
 export const DEFAULT_CONFIGS = {
 	table: {
 		type: 'table',
@@ -181,14 +182,14 @@ export const DEFAULT_CONFIGS = {
 	}
 }
 
-// Field type detection based on API analysis
+// Field types for data formatting
 export const FIELD_TYPE_MAPPING = {
-	// Price-related fields
-	'c': 'currency',      // Current price
-	'o': 'currency',      // Open price
-	'h': 'currency',      // High price
-	'l': 'currency',      // Low price
-	'pc': 'currency',     // Previous close
+	// Price fields
+	'c': 'currency',
+	'o': 'currency',
+	'h': 'currency',
+	'l': 'currency',
+	'pc': 'currency',
 	'price': 'currency',
 	'open': 'currency',
 	'high': 'currency',
@@ -197,16 +198,16 @@ export const FIELD_TYPE_MAPPING = {
 	'marketCapitalization': 'currency',
 
 	// Percentage fields
-	'dp': 'percentage',   // Daily percentage change
+	'dp': 'percentage',
 	'change_percent': 'percentage',
 	'change_24h': 'percentage',
 
 	// Number fields
-	'd': 'number',        // Daily change
+	'd': 'number',
 	'change': 'number',
 	'volume': 'number',
 	'shareOutstanding': 'number',
-	't': 'number',        // Timestamp
+	't': 'number',
 
 	// Text fields
 	'symbol': 'text',
@@ -222,32 +223,32 @@ export const FIELD_TYPE_MAPPING = {
 	'phone': 'text'
 }
 
-// Auto-generate widget configuration based on data structure
+// Make widget config based on data
 export function generateWidgetConfig(data, widgetType = 'table') {
 	if (!data || !Array.isArray(data) || data.length === 0) {
 		return DEFAULT_CONFIGS[widgetType] || DEFAULT_CONFIGS.table
 	}
 
-	const sampleItem = data[0]
-	const availableFields = Object.keys(sampleItem)
+	const firstItem = data[0]
+	const fields = Object.keys(firstItem)
 
 	if (widgetType === 'table') {
-		// Generate table columns based on available fields
-		const columns = availableFields
+		// Make table columns from data fields
+		const columns = fields
 			.filter(field => field !== 'last_updated' && field !== 'timestamp')
-			.slice(0, 7) // Limit to 7 columns for optimal display
+			.slice(0, 7) // Only show 7 columns max
 			.map(field => ({
 				key: field,
-				label: formatFieldLabel(field),
-				width: calculateColumnWidth(field, availableFields.length),
-				type: FIELD_TYPE_MAPPING[field] || detectFieldType(sampleItem[field])
+				label: makeFieldLabel(field),
+				width: getColumnWidth(field, fields.length),
+				type: FIELD_TYPE_MAPPING[field] || guessFieldType(firstItem[field])
 			}))
 
 		return {
 			type: 'table',
 			dataSource: 'stocks',
 			displayFields: columns.map(col => col.key),
-			columns,
+			columns: columns,
 			sortBy: columns[0]?.key || 'symbol',
 			sortOrder: 'asc',
 			refreshInterval: 60
@@ -257,9 +258,9 @@ export function generateWidgetConfig(data, widgetType = 'table') {
 	return DEFAULT_CONFIGS[widgetType] || DEFAULT_CONFIGS.table
 }
 
-// Helper functions
-function formatFieldLabel(field) {
-	const labelMappings = {
+// Make nice field labels
+function makeFieldLabel(field) {
+	const labels = {
 		'c': 'Current Price',
 		'd': 'Change',
 		'dp': 'Change %',
@@ -272,42 +273,44 @@ function formatFieldLabel(field) {
 		'finnhubIndustry': 'Industry'
 	}
 
-	if (labelMappings[field]) {
-		return labelMappings[field]
+	if (labels[field]) {
+		return labels[field]
 	}
 
-	// Auto-format field names
+	// Make field name look nice
 	return field
 		.replace(/([A-Z])/g, ' $1')
 		.replace(/^./, str => str.toUpperCase())
 		.trim()
 }
 
-function calculateColumnWidth(field, totalFields) {
-	// Distribute width based on field importance and type
-	const primaryFields = ['symbol', 'name', 'company']
-	const priceFields = ['c', 'price', 'o', 'h', 'l']
+// Calculate column width
+function getColumnWidth(field, totalFields) {
+	const importantFields = ['symbol', 'name', 'company']
 
-	if (primaryFields.includes(field)) {
-		return totalFields <= 4 ? '25%' : totalFields <= 6 ? '20%' : '15%'
+	if (importantFields.includes(field)) {
+		if (totalFields <= 4) return '25%'
+		if (totalFields <= 6) return '20%'
+		return '15%'
 	}
 
 	if (field === 'name' || field === 'company') {
 		return '30%'
 	}
 
-	const remainingWidth = 100
-	const remainingFields = totalFields
-	return `${Math.floor(remainingWidth / remainingFields)}%`
+	const width = Math.floor(100 / totalFields)
+	return width + '%'
 }
 
-function detectFieldType(value) {
+// Guess field type from value
+function guessFieldType(value) {
 	if (typeof value === 'number') {
-		return value < 1 && value > -1 ? 'percentage' : 'number'
+		if (value < 1 && value > -1) return 'percentage'
+		return 'number'
 	}
 
 	if (typeof value === 'string') {
-		// Check if it's a currency value
+		// Check if it looks like money
 		if (/^\$?[\d,]+\.?\d*$/.test(value)) {
 			return 'currency'
 		}
@@ -321,40 +324,41 @@ function detectFieldType(value) {
 	return 'text'
 }
 
-// Get optimized configuration for specific data types
+// Get best config for data type
 export function getOptimizedConfig(dataType, data) {
-	switch (dataType) {
-		case 'stocks':
-			// Analyze the data to determine if it's basic quotes or enhanced profiles
-			if (data && data[0]) {
-				const hasProfileData = data[0].marketCapitalization || data[0].shareOutstanding
-				return hasProfileData ? WIDGET_CONFIGS.enhancedStocks : WIDGET_CONFIGS.stockQuotes
-			}
+	if (dataType === 'stocks') {
+		// Check if data has company info
+		if (data && data[0]) {
+			const hasCompanyInfo = data[0].marketCapitalization || data[0].shareOutstanding
+			if (hasCompanyInfo) return WIDGET_CONFIGS.enhancedStocks
 			return WIDGET_CONFIGS.stockQuotes
-
-		case 'crypto':
-			return {
-				...WIDGET_CONFIGS.stockQuotes,
-				dataSource: 'crypto',
-				columns: WIDGET_CONFIGS.stockQuotes.columns.map(col => ({
-					...col,
-					label: col.label.replace('Stock', 'Crypto')
-				}))
-			}
-
-		case 'forex':
-			return {
-				...WIDGET_CONFIGS.compactStocks,
-				dataSource: 'forex',
-				columns: [
-					{ key: 'pair', label: 'Currency Pair', width: '30%', type: 'text' },
-					{ key: 'rate', label: 'Exchange Rate', width: '25%', type: 'number' },
-					{ key: 'change', label: 'Change', width: '22.5%', type: 'number' },
-					{ key: 'change_percent', label: 'Change %', width: '22.5%', type: 'percentage' }
-				]
-			}
-
-		default:
-			return generateWidgetConfig(data)
+		}
+		return WIDGET_CONFIGS.stockQuotes
 	}
+
+	if (dataType === 'crypto') {
+		return {
+			...WIDGET_CONFIGS.stockQuotes,
+			dataSource: 'crypto',
+			columns: WIDGET_CONFIGS.stockQuotes.columns.map(col => ({
+				...col,
+				label: col.label.replace('Stock', 'Crypto')
+			}))
+		}
+	}
+
+	if (dataType === 'forex') {
+		return {
+			...WIDGET_CONFIGS.compactStocks,
+			dataSource: 'forex',
+			columns: [
+				{ key: 'pair', label: 'Currency Pair', width: '30%', type: 'text' },
+				{ key: 'rate', label: 'Exchange Rate', width: '25%', type: 'number' },
+				{ key: 'change', label: 'Change', width: '22.5%', type: 'number' },
+				{ key: 'change_percent', label: 'Change %', width: '22.5%', type: 'percentage' }
+			]
+		}
+	}
+
+	return generateWidgetConfig(data)
 }
