@@ -2,55 +2,55 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit"
 import widgetsReducer from "./slices/widgets-slice"
 import layoutReducer from "./slices/layout-slice"
 import settingsReducer from "./slices/settings-slice"
-import { StorageService } from "../storage-service"
+import { saveWidgets, saveSettings, saveLayout, loadWidgets, loadSettings, loadLayout } from "../storage-service"
 
-// Enhanced localStorage middleware with error handling and debouncing
+// Simple localStorage middleware
 const localStorageMiddleware = (store) => {
 	let saveTimeout = null
 
 	return (next) => (action) => {
 		const result = next(action)
 
-		// Debounce saves to avoid excessive writes
+		// Save with simple delay to avoid too many writes
 		if (typeof window !== "undefined") {
 			clearTimeout(saveTimeout)
 			saveTimeout = setTimeout(() => {
 				try {
 					const state = store.getState()
 
-					// Use StorageService for better persistence management
-					StorageService.saveWidgets(state.widgets.widgets || [])
-					StorageService.saveSettings(state.settings || {})
-					StorageService.saveLayout(state.layout || {})
+					// Save using storage functions
+					saveWidgets(state.widgets.widgets || [])
+					saveSettings(state.settings || {})
+					saveLayout(state.layout || {})
 
-					// Only log important save events
+					// Log important save events
 					if (action.type.includes('updateWidget') || action.type.includes('addWidget') || action.type.includes('removeWidget')) {
 						console.log("Widget changes saved to localStorage")
 					}
 				} catch (error) {
 					console.warn("Failed to save state to localStorage:", error)
 				}
-			}, 1000) // 1 second debounce
+			}, 1000) // 1 second delay
 		}
 
 		return result
 	}
 }
 
-// Load state from enhanced storage service
+// Load state from storage
 const loadStateFromStorage = () => {
 	if (typeof window === "undefined") return {}
 
 	try {
 		return {
 			widgets: {
-				widgets: StorageService.loadWidgets([]),
+				widgets: loadWidgets([]),
 				loading: false,
 				error: null,
 				apiTestResult: null,
 				apiTesting: false,
 			},
-			settings: StorageService.loadSettings({
+			settings: loadSettings({
 				theme: "dark",
 				autoRefresh: true,
 				globalRefreshInterval: 30000,
@@ -80,7 +80,7 @@ const loadStateFromStorage = () => {
 					showWelcomeMessage: true,
 				},
 			}),
-			layout: StorageService.loadLayout({
+			layout: loadLayout({
 				dragging: false,
 				gridSize: 12,
 				rowHeight: 100,
