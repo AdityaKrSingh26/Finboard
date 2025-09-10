@@ -6,11 +6,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/loader"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { Plus, BarChart3, Search } from "lucide-react"
+import Toast from "@/components/ui/toast"
+import { Plus, BarChart3, Search, Sparkles } from "lucide-react"
 import WidgetCard from "@/components/dashboard/widget-card"
 import WidgetRenderer from "@/components/widgets/widget-renderer"
 import AddWidgetModal from "@/components/modals/add-widget-modal"
 import WidgetSettingsModal from "@/components/modals/widget-settings-modal"
+import DashboardTemplatesModal from "@/components/modals/dashboard-templates-modal"
+import TemplateSelector from "@/components/dashboard/template-selector"
 import DraggableWidget from "@/components/dashboard/draggable-widget"
 import DroppableArea from "@/components/dashboard/droppable-area"
 import {
@@ -32,6 +35,7 @@ import {
 	fetchWidgetData,
 	selectWidgetsLoading,
 	reorderWidgets,
+	addWidgetsFromTemplate,
 } from "@/lib/store/slices/widgets-slice"
 import {
 	selectDashboardSettings,
@@ -53,9 +57,11 @@ export default function Dashboard() {
 	const [searchQuery, setSearchQuery] = useState("")
 	const [showAddModal, setShowAddModal] = useState(false)
 	const [showSettingsModal, setShowSettingsModal] = useState(false)
+	const [showTemplatesModal, setShowTemplatesModal] = useState(false)
 	const [selectedWidget, setSelectedWidget] = useState(null)
 	const [activeId, setActiveId] = useState(null)
 	const [isMounted, setIsMounted] = useState(false)
+	const [toast, setToast] = useState(null)
 
 	// Drag and drop setup
 	const sensors = useSensors(
@@ -74,35 +80,63 @@ export default function Dashboard() {
 		setIsMounted(true)
 	}, [])
 
-	// Auto refresh widgets
+	// Auto refresh widgets - with better throttling
 	useEffect(() => {
-		if (!autoRefresh) return
+		if (!autoRefresh || widgets.length === 0) return
 
 		const interval = setInterval(() => {
-			widgets.forEach((widget) => {
-				dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
-			})
+			// Only refresh widgets that have data and aren't currently loading
+			const widgetsToRefresh = widgets.filter(widget => 
+				widget.data && !widget.loading
+			)
+
+			if (widgetsToRefresh.length > 0) {
+				console.log(`🔄 Auto-refreshing ${widgetsToRefresh.length} widgets`)
+				
+				// Stagger refresh calls
+				widgetsToRefresh.forEach((widget, index) => {
+					setTimeout(() => {
+						dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
+					}, index * 200) // 200ms delay between refreshes
+				})
+			}
 		}, globalRefreshInterval)
 
 		return () => clearInterval(interval)
-	}, [dispatch, widgets, autoRefresh, globalRefreshInterval])
+	}, [dispatch, autoRefresh, globalRefreshInterval, widgets.length])
 
-	// Load widget data when widgets change
+	// Load widget data when widgets change - with better control
 	useEffect(() => {
-		console.log("📊 Dashboard effect - Loading widget data for widgets:", widgets.map(w => ({
-			id: w.id,
-			title: w.title,
-			hasData: !!w.data,
-			dataSource: w.config?.dataSource
-		})))
+		// Only fetch data for widgets that don't have data and aren't already loading
+		const widgetsNeedingData = widgets.filter(widget => 
+			!widget.data && !widget.loading && !widget.error
+		)
 
-		widgets.forEach((widget) => {
-			if (!widget.data) {
-				console.log(`🚀 Fetching data for widget: ${widget.title} (${widget.id})`)
-				dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
+		if (widgetsNeedingData.length > 0) {
+			console.log(`🚀 Fetching data for ${widgetsNeedingData.length} new widgets`)
+			
+			// Limit to maximum 3 concurrent API calls to prevent overwhelming
+			const maxConcurrent = Math.min(3, widgetsNeedingData.length)
+			
+			// Stagger the API calls to prevent overwhelming the APIs
+			widgetsNeedingData.slice(0, maxConcurrent).forEach((widget, index) => {
+				setTimeout(() => {
+					dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
+				}, index * 1000) // 1 second delay between each API call
+			})
+
+			// Load remaining widgets after the first batch completes
+			if (widgetsNeedingData.length > maxConcurrent) {
+				setTimeout(() => {
+					widgetsNeedingData.slice(maxConcurrent).forEach((widget, index) => {
+						setTimeout(() => {
+							dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
+						}, index * 1000)
+					})
+				}, maxConcurrent * 1000 + 2000) // Wait for first batch + 2 seconds
 			}
-		})
-	}, [dispatch, widgets])
+		}
+	}, [dispatch, widgets.length]) // Only depend on widget count, not the entire widgets array
 
 	// When drag starts
 	function handleDragStart(event) {
@@ -154,6 +188,28 @@ export default function Dashboard() {
 		}
 	}
 
+	// Open templates modal
+	function handleOpenTemplates() {
+		setShowTemplatesModal(true)
+	}
+
+	// Apply dashboard template
+	function handleApplyTemplate(templateWidgets, template) {
+		console.log(`📋 Applying template: ${template.name} with ${templateWidgets.length} widgets`)
+		
+		dispatch(addWidgetsFromTemplate({ 
+			widgets: templateWidgets, 
+			clearExisting: false 
+		}))
+		setShowTemplatesModal(false)
+		
+		// Show success toast
+		setToast({
+			message: `✨ ${template.name} template applied! Added ${templateWidgets.length} widgets.`,
+			type: "success"
+		})
+	}
+
 	// Clear all data
 	function handleClearData() {
 		console.log("🧹 Clearing all localStorage data")
@@ -194,10 +250,11 @@ export default function Dashboard() {
 							<Button 
 								variant="outline" 
 								size="sm"
-								onClick={() => window.open('/theme-demo', '_blank')}
+								onClick={handleOpenTemplates}
 								className="hidden sm:flex"
 							>
-								Theme Demo
+								<Sparkles className="w-4 h-4 mr-2" />
+								Templates
 							</Button>
 							<Button
 								variant="outline"
@@ -248,10 +305,11 @@ export default function Dashboard() {
 						<Button 
 							variant="outline" 
 							size="sm"
-							onClick={() => window.open('/theme-demo', '_blank')}
+							onClick={handleOpenTemplates}
 							className="hidden sm:flex"
 						>
-							Theme Demo
+							<Sparkles className="w-4 h-4 mr-2" />
+							Templates
 						</Button>
 						<Button onClick={handleAddWidget} className="bg-primary hover:bg-primary/90 text-primary-foreground">
 							<Plus className="w-4 h-4 mr-2" />
@@ -264,31 +322,11 @@ export default function Dashboard() {
 			{/* Main Content */}
 			<main className="p-6">
 				{widgets.length === 0 ? (
-					// Show empty state when no widgets
-					<div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-						<div className="flex items-center justify-center w-20 h-20 bg-muted rounded-full mb-6">
-							<BarChart3 className="w-10 h-10 text-muted-foreground" />
-						</div>
-						<h2 className="text-3xl font-semibold text-foreground mb-3">Build Your Finance Dashboard</h2>
-						<p className="text-muted-foreground mb-8 max-w-lg leading-relaxed">
-							Create custom widgets by connecting to any finance API. Track stocks, crypto, forex, or economic
-							indicators - all in real time.
-						</p>
-						<Card
-							onClick={handleAddWidget}
-							className="w-80 bg-card border-2 border-dashed border-primary/50 hover:border-primary transition-all duration-200 cursor-pointer hover:bg-accent/50"
-						>
-							<CardContent className="flex flex-col items-center justify-center p-10">
-								<div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
-									<Plus className="w-8 h-8 text-primary-foreground" />
-								</div>
-								<h3 className="text-xl font-medium text-foreground mb-2">Add Widget</h3>
-								<p className="text-sm text-muted-foreground text-center">
-									Connect to a finance API and create a custom widget
-								</p>
-							</CardContent>
-						</Card>
-					</div>
+					// Show template selector when no widgets
+					<TemplateSelector 
+						onOpenTemplates={handleOpenTemplates}
+						onAddWidget={handleAddWidget}
+					/>
 				) : (
 					// Show widgets when we have them
 					<DndContext
@@ -377,6 +415,22 @@ export default function Dashboard() {
 				}}
 				widget={selectedWidget}
 			/>
+
+			<DashboardTemplatesModal
+				isOpen={showTemplatesModal}
+				onClose={() => setShowTemplatesModal(false)}
+				onApplyTemplate={handleApplyTemplate}
+				existingWidgetCount={widgets.length}
+			/>
+
+			{/* Toast notifications */}
+			{toast && (
+				<Toast
+					message={toast.message}
+					type={toast.type}
+					onClose={() => setToast(null)}
+				/>
+			)}
 		</div>
 	)
 }

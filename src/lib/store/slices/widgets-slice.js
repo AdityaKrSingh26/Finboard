@@ -10,6 +10,7 @@ export const fetchWidgetData = createAsyncThunk(
 			const data = await fetchData(config.dataSource, config)
 			return { widgetId, data }
 		} catch (error) {
+			// Only log errors, not every successful fetch
 			console.error(`❌ fetchWidgetData error for widget ${widgetId}:`, error.message)
 			return rejectWithValue({ widgetId, error: error.message })
 		}
@@ -277,6 +278,38 @@ const widgetsSlice = createSlice({
 		clearApiTestResult: (state) => {
 			state.apiTestResult = null
 		},
+
+		// Add multiple widgets from template
+		addWidgetsFromTemplate: (state, action) => {
+			const { widgets: templateWidgets, clearExisting = false } = action.payload
+			
+			// Clear existing widgets if requested
+			if (clearExisting) {
+				state.widgets = []
+			}
+
+			// Add template widgets with proper initial state
+			const newWidgets = templateWidgets.map((widget, index) => ({
+				id: `widget-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+				position: { x: 0, y: state.widgets.length + index },
+				size: { 
+					width: widget.type === 'chart' ? 6 : 12, 
+					height: widget.type === 'card' ? 4 : 6 
+				},
+				data: null,
+				loading: false, // Start as not loading to prevent immediate fetch
+				error: null,
+				lastUpdated: null,
+				config: {
+					refreshInterval: 60, // Default to 60 seconds for templates
+					displayFields: [],
+					...widget.config,
+				},
+				...widget,
+			}))
+
+			state.widgets.push(...newWidgets)
+		},
 	},
 
 	extraReducers: (builder) => {
@@ -340,6 +373,7 @@ export const {
 	bulkUpdateWidgets,
 	resetAllWidgetData,
 	clearApiTestResult,
+	addWidgetsFromTemplate,
 } = widgetsSlice.actions
 
 // Enhanced Selectors
