@@ -1,0 +1,444 @@
+{
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "company": "Apple Inc.",
+      "price": 184.25,
+      "change": 2.15,
+      "change_percent": 1.18,
+      "volume": 52341000,
+      "market_cap": "2.87T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 184.25,
+      "d": 2.15,
+      "dp": 1.18,
+      "h": 185.50,
+      "l": 182.10,
+      "o": 183.00,
+      "pc": 182.10
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "company": "Alphabet Inc.",
+      "price": 142.78,
+      "change": -1.85,
+      "change_percent": -1.28,
+      "volume": 28567000,
+      "market_cap": "1.76T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 142.78,
+      "d": -1.85,
+      "dp": -1.28,
+      "h": 144.20,
+      "l": 141.90,
+      "o": 143.50,
+      "pc": 144.63
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft Corporation",
+      "company": "Microsoft Corporation",
+      "price": 415.32,
+      "change": 3.45,
+      "change_percent": 0.84,
+      "volume": 19238000,
+      "market_cap": "3.08T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 415.32,
+      "d": 3.45,
+      "dp": 0.84,
+      "h": 416.80,
+      "l": 413.20,
+      "o": 414.10,
+      "pc": 411.87
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "company": "Tesla, Inc.",
+      "price": 238.95,
+      "change": -4.12,
+      "change_percent": -1.69,
+      "volume": 45789000,
+      "market_cap": "763.2B",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 238.95,
+      "d": -4.12,
+      "dp": -1.69,
+      "h": 242.10,
+      "l": 237.50,
+      "o": 241.30,
+      "pc": 243.07
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA Corporation",
+      "company": "NVIDIA Corporation",
+      "price": 132.87,
+      "change": 5.23,
+      "change_percent": 4.10,
+      "volume": 67432000,
+      "market_cap": "3.27T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 132.87,
+      "d": 5.23,
+      "dp": 4.10,
+      "h": 133.45,
+      "l": 128.90,
+      "o": 129.20,
+      "pc": 127.64
+    },
+    {
+      "symbol": "AMZN",
+      "name": "Amazon.com, Inc.",
+      "company": "Amazon.com, Inc.",
+      "price": 178.94,
+      "change": 1.87,
+      "change_percent": 1.06,
+      "volume": 31456000,
+      "market_cap": "1.87T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 178.94,
+      "d": 1.87,
+      "dp": 1.06,
+      "h": 179.80,
+      "l": 176.20,
+      "o": 177.50,
+      "pc": 177.07
+    },
+    {
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "company": "Meta Platforms, Inc.",
+      "price": 542.81,
+      "change": -8.45,
+      "change_percent": -1.53,
+      "volume": 12789000,
+      "market_cap": "1.38T",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 542.81,
+      "d": -8.45,
+      "dp": -1.53,
+      "h": 548.20,
+      "l": 540.10,
+      "o": 545.60,
+      "pc": 551.26
+    },
+    {
+      "symbol": "NFLX",
+      "name": "Netflix, Inc.",
+      "company": "Netflix, Inc.",
+      "price": 698.54,
+      "change": 12.34,
+      "change_percent": 1.80,
+      "volume": 4567000,
+      "market_cap": "301.2B",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 698.54,
+      "d": 12.34,
+      "dp": 1.80,
+      "h": 701.20,
+      "l": 692.30,
+      "o": 694.80,
+      "pc": 686.20
+    },
+    {
+      "symbol": "AMD",
+      "name": "Advanced Micro Devices, Inc.",
+      "company": "Advanced Micro Devices, Inc.",
+      "price": 142.67,
+      "change": 2.89,
+      "change_percent": 2.07,
+      "volume": 18945000,
+      "market_cap": "230.4B",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NASDAQ",
+      "c": 142.67,
+      "d": 2.89,
+      "dp": 2.07,
+      "h": 143.80,
+      "l": 139.20,
+      "o": 140.15,
+      "pc": 139.78
+    },
+    {
+      "symbol": "CRM",
+      "name": "Salesforce, Inc.",
+      "company": "Salesforce, Inc.",
+      "price": 315.42,
+      "change": -2.67,
+      "change_percent": -0.84,
+      "volume": 2345000,
+      "market_cap": "312.8B",
+      "country": "US",
+      "currency": "USD",
+      "exchange": "NYSE",
+      "c": 315.42,
+      "d": -2.67,
+      "dp": -0.84,
+      "h": 318.90,
+      "l": 313.80,
+      "o": 317.20,
+      "pc": 318.09
+    }
+  ],
+  "crypto": [
+    {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "price": 92345.67,
+      "change_24h": 1234.56,
+      "change_percent_24h": 1.35,
+      "volume_24h": "28.4B",
+      "market_cap": "1.82T"
+    },
+    {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "price": 3245.89,
+      "change_24h": -89.45,
+      "change_percent_24h": -2.68,
+      "volume_24h": "15.2B",
+      "market_cap": "389.7B"
+    },
+    {
+      "symbol": "BNB",
+      "name": "Binance Coin",
+      "price": 678.12,
+      "change_24h": 23.45,
+      "change_percent_24h": 3.59,
+      "volume_24h": "2.1B",
+      "market_cap": "98.2B"
+    },
+    {
+      "symbol": "ADA",
+      "name": "Cardano",
+      "price": 1.23,
+      "change_24h": 0.05,
+      "change_percent_24h": 4.23,
+      "volume_24h": "892M",
+      "market_cap": "43.8B"
+    },
+    {
+      "symbol": "SOL",
+      "name": "Solana",
+      "price": 234.56,
+      "change_24h": -12.34,
+      "change_percent_24h": -5.00,
+      "volume_24h": "3.4B",
+      "market_cap": "109.2B"
+    }
+  ],
+  "forex": [
+    {
+      "pair": "EUR/USD",
+      "rate": 1.0532,
+      "change": 0.0023,
+      "change_percent": 0.22
+    },
+    {
+      "pair": "GBP/USD",
+      "rate": 1.2478,
+      "change": -0.0045,
+      "change_percent": -0.36
+    },
+    {
+      "pair": "USD/JPY",
+      "rate": 149.25,
+      "change": 0.87,
+      "change_percent": 0.58
+    },
+    {
+      "pair": "USD/CHF",
+      "rate": 0.9012,
+      "change": 0.0034,
+      "change_percent": 0.38
+    },
+    {
+      "pair": "AUD/USD",
+      "rate": 0.6523,
+      "change": -0.0012,
+      "change_percent": -0.18
+    }
+  ],
+  "watchlist": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "price": 184.25,
+      "change_percent": 1.18
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "price": 142.78,
+      "change_percent": -1.28
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft Corporation",
+      "price": 415.32,
+      "change_percent": 0.84
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "price": 238.95,
+      "change_percent": -1.69
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA Corporation",
+      "price": 132.87,
+      "change_percent": 4.10
+    }
+  ],
+  "gainers": [
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA Corporation",
+      "price": 132.87,
+      "change_percent": 4.10
+    },
+    {
+      "symbol": "AMD",
+      "name": "Advanced Micro Devices",
+      "price": 142.67,
+      "change_percent": 2.07
+    },
+    {
+      "symbol": "NFLX",
+      "name": "Netflix, Inc.",
+      "price": 698.54,
+      "change_percent": 1.80
+    }
+  ],
+  "losers": [
+    {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "price": 238.95,
+      "change_percent": -1.69
+    },
+    {
+      "symbol": "META",
+      "name": "Meta Platforms",
+      "price": 542.81,
+      "change_percent": -1.53
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "price": 142.78,
+      "change_percent": -1.28
+    }
+  ],
+  "market_summary": {
+    "indices": [
+      {
+        "name": "S&P 500",
+        "value": 4798.67,
+        "change": 23.45,
+        "change_percent": 0.49
+      },
+      {
+        "name": "Dow Jones",
+        "value": 37234.89,
+        "change": -89.23,
+        "change_percent": -0.24
+      },
+      {
+        "name": "NASDAQ",
+        "value": 15123.45,
+        "change": 67.89,
+        "change_percent": 0.45
+      }
+    ],
+    "commodities": [
+      {
+        "name": "Gold",
+        "value": 2067.89,
+        "change": 12.45,
+        "change_percent": 0.60,
+        "unit": "USD/oz"
+      },
+      {
+        "name": "Oil (WTI)",
+        "value": 78.45,
+        "change": -1.23,
+        "change_percent": -1.54,
+        "unit": "USD/barrel"
+      },
+      {
+        "name": "Silver",
+        "value": 24.67,
+        "change": 0.45,
+        "change_percent": 1.86,
+        "unit": "USD/oz"
+      }
+    ]
+  },
+  "chart_data": {
+    "AAPL": [
+      {
+        "date": "2024-01-01",
+        "open": 185.64,
+        "high": 186.95,
+        "low": 184.35,
+        "close": 185.92,
+        "volume": 52341000
+      },
+      {
+        "date": "2024-01-02",
+        "open": 185.92,
+        "high": 187.23,
+        "low": 184.78,
+        "close": 186.45,
+        "volume": 48567000
+      },
+      {
+        "date": "2024-01-03",
+        "open": 186.45,
+        "high": 188.12,
+        "low": 185.89,
+        "close": 187.34,
+        "volume": 51234000
+      },
+      {
+        "date": "2024-01-04",
+        "open": 187.34,
+        "high": 188.67,
+        "low": 186.23,
+        "close": 187.98,
+        "volume": 46789000
+      },
+      {
+        "date": "2024-01-05",
+        "open": 187.98,
+        "high": 189.45,
+        "low": 187.12,
+        "close": 188.76,
+        "volume": 54321000
+      }
+    ]
+  }
+}
