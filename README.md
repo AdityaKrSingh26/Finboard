@@ -14,6 +14,17 @@ This project was developed as part of the **Groww Web Intern Assignment** - a cu
 
 ---
 
+## UI Screenshots
+<img width="1917" height="737" alt="image" src="https://github.com/user-attachments/assets/f486f2a0-2e01-4c8c-bd42-98ccbb59f466" />
+<img width="1889" height="768" alt="image" src="https://github.com/user-attachments/assets/bf70c613-8e36-49f9-abc0-ce8bc83a434c" />
+<img width="1916" height="842" alt="image" src="https://github.com/user-attachments/assets/d4a13468-f820-4f30-b282-baf13fb6ac8e" />
+<img width="1903" height="950" alt="image" src="https://github.com/user-attachments/assets/29c06779-0a4d-4258-a907-48a8f06eea67" />
+<img width="1907" height="769" alt="image" src="https://github.com/user-attachments/assets/b4096260-4943-4aed-89c1-e578b5ac0381" />
+
+
+
+---
+
 ## Implemented Features
 
 ### Core Features (Completed)
