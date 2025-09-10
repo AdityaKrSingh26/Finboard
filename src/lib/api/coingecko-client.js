@@ -27,16 +27,9 @@ export class CoinGeckoClient extends BaseAPIClient {
 	getAuthParams() {
 		const params = {};
 		if (this.config.API_KEY && this.config.API_KEY !== '') {
-			// For Pro API keys (CG-xxx format), we'll use headers instead of query params
-			// For demo keys, use query params
 			if (!this.config.API_KEY.startsWith('CG-')) {
 				params.x_cg_demo_api_key = this.config.API_KEY;
-				console.log(`🔑 CoinGecko: Using demo API key in query params`);
-			} else {
-				console.log(`🔑 CoinGecko: Using Pro API key in headers`);
 			}
-		} else {
-			console.log(`🔓 CoinGecko: Using public API (no key)`);
 		}
 		return params;
 	}
@@ -50,23 +43,16 @@ export class CoinGeckoClient extends BaseAPIClient {
 					...options.headers,
 					'x-cg-pro-api-key': this.config.API_KEY
 				};
-				// Remove API key from params for Pro API (use header instead)
 				if (options.params && options.params.x_cg_pro_api_key) {
 					delete options.params.x_cg_pro_api_key;
 				}
 			}
 
-			// Try the original request first
 			return await super.makeRequest(url, options, useCache, cacheTTL);
 		} catch (error) {
 			// If using Pro API and it fails, try falling back to public API
 			if (this.config.API_KEY && this.config.API_KEY.startsWith('CG-') && url.includes('pro-api.coingecko.com')) {
-				console.warn(`⚠️ CoinGecko Pro API failed (${error.message}), falling back to public API`);
-				
-				// Replace Pro API URL with public API URL
 				const fallbackUrl = url.replace('https://pro-api.coingecko.com/api/v3', 'https://api.coingecko.com/api/v3');
-				
-				// Remove auth parameters and headers for public API
 				const fallbackOptions = { ...options };
 				if (fallbackOptions.params) {
 					const { x_cg_pro_api_key, x_cg_demo_api_key, ...cleanParams } = fallbackOptions.params;
@@ -76,12 +62,9 @@ export class CoinGeckoClient extends BaseAPIClient {
 					const { 'x-cg-pro-api-key': removed, ...cleanHeaders } = fallbackOptions.headers;
 					fallbackOptions.headers = cleanHeaders;
 				}
-				
-				console.log(`🔄 CoinGecko: Retrying with public API: ${fallbackUrl}`);
 				return await super.makeRequest(fallbackUrl, fallbackOptions, useCache, cacheTTL);
 			}
-			
-			throw error; // Re-throw if not a Pro API fallback case
+			throw error;
 		}
 	}
 

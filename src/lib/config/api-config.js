@@ -34,17 +34,7 @@ export const API_CONFIG = {
 	},
 
 	COINGECKO: {
-		get BASE_URL() {
-			// Temporarily force public API for better compatibility
-			return process.env.NEXT_PUBLIC_COINGECKO_BASE_URL || 'https://api.coingecko.com/api/v3';
-			
-			// Original Pro API logic (commented out for now)
-			// const apiKey = process.env.NEXT_PUBLIC_COINGECKO_API_KEY;
-			// if (apiKey && apiKey.startsWith('CG-')) {
-			// 	return 'https://pro-api.coingecko.com/api/v3';
-			// }
-			// return process.env.NEXT_PUBLIC_COINGECKO_BASE_URL || 'https://api.coingecko.com/api/v3';
-		},
+		BASE_URL: process.env.NEXT_PUBLIC_COINGECKO_BASE_URL || 'https://api.coingecko.com/api/v3',
 		API_KEY: process.env.NEXT_PUBLIC_COINGECKO_API_KEY,
 		RATE_LIMIT: {
 			REQUESTS_PER_MINUTE: 30,

@@ -4,9 +4,8 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Spinner, PageLoader } from "@/components/ui/loader"
-import { Plus, BarChart3, Search, Moon, Sun, Settings } from "lucide-react"
-import { useTheme } from "next-themes"
+import { Spinner } from "@/components/ui/loader"
+import { Plus, BarChart3, Search } from "lucide-react"
 import WidgetCard from "@/components/dashboard/widget-card"
 import WidgetRenderer from "@/components/widgets/widget-renderer"
 import AddWidgetModal from "@/components/modals/add-widget-modal"
@@ -41,7 +40,7 @@ import {
 import { setDragging } from "@/lib/store/slices/layout-slice"
 
 export default function Dashboard() {
-	const { theme, setTheme } = useTheme()
+	// Get data from Redux store
 	const dispatch = useAppDispatch()
 	const widgets = useAppSelector(selectAllWidgets)
 	const dashboardSettings = useAppSelector(selectDashboardSettings)
@@ -49,14 +48,15 @@ export default function Dashboard() {
 	const globalRefreshInterval = useAppSelector(selectGlobalRefreshInterval)
 	const isLoading = useAppSelector(selectWidgetsLoading)
 
+	// State for UI
 	const [searchQuery, setSearchQuery] = useState("")
 	const [showAddModal, setShowAddModal] = useState(false)
 	const [showSettingsModal, setShowSettingsModal] = useState(false)
 	const [selectedWidget, setSelectedWidget] = useState(null)
 	const [activeId, setActiveId] = useState(null)
 	const [isMounted, setIsMounted] = useState(false)
-	const [subtitle, setSubtitle] = useState(dashboardSettings?.subtitle || "Real-time financial data")
 
+	// Drag and drop setup
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: {
@@ -68,29 +68,12 @@ export default function Dashboard() {
 		}),
 	)
 
-	// Handle hydration mismatch by ensuring component is mounted
+	// Make sure component is mounted before showing
 	useEffect(() => {
 		setIsMounted(true)
 	}, [])
 
-	// Update subtitle when dashboardSettings becomes available
-	useEffect(() => {
-		if (dashboardSettings?.subtitle && !subtitle.includes("active widget")) {
-			setSubtitle(dashboardSettings.subtitle)
-		}
-	}, [dashboardSettings?.subtitle, subtitle])
-
-	// Clean up problematic widgets on mount
-	useEffect(() => {
-		if (isMounted) {
-			const newSubtitle = widgets.length > 0
-				? `${widgets.length} active widget${widgets.length !== 1 ? "s" : ""} • ${autoRefresh ? "Auto-refresh enabled" : "Manual refresh"
-				}`
-				: dashboardSettings?.subtitle || "Real-time Financial Dashboard";
-			setSubtitle(newSubtitle);
-		}
-	}, [isMounted, widgets.length, autoRefresh, dashboardSettings?.subtitle, dispatch])
-
+	// Auto refresh widgets
 	useEffect(() => {
 		if (!autoRefresh) return
 
@@ -103,6 +86,7 @@ export default function Dashboard() {
 		return () => clearInterval(interval)
 	}, [dispatch, widgets, autoRefresh, globalRefreshInterval])
 
+	// Load widget data when widgets change
 	useEffect(() => {
 		widgets.forEach((widget) => {
 			if (!widget.data) {
@@ -111,13 +95,15 @@ export default function Dashboard() {
 		})
 	}, [dispatch, widgets])
 
-	const handleDragStart = (event) => {
+	// When drag starts
+	function handleDragStart(event) {
 		const { active } = event
 		setActiveId(active.id)
 		dispatch(setDragging(true))
 	}
 
-	const handleDragEnd = (event) => {
+	// When drag ends
+	function handleDragEnd(event) {
 		const { active, over } = event
 
 		setActiveId(null)
@@ -134,20 +120,24 @@ export default function Dashboard() {
 		}
 	}
 
-	const handleAddWidget = () => {
+	// Open add widget modal
+	function handleAddWidget() {
 		setShowAddModal(true)
 	}
 
-	const handleCreateWidget = (widgetConfig) => {
+	// Create new widget
+	function handleCreateWidget(widgetConfig) {
 		dispatch(addWidget(widgetConfig))
 		setShowAddModal(false)
 	}
 
-	const handleRemoveWidget = (widgetId) => {
+	// Remove a widget
+	function handleRemoveWidget(widgetId) {
 		dispatch(removeWidget(widgetId))
 	}
 
-	const handleWidgetSettings = (widgetId) => {
+	// Open widget settings
+	function handleWidgetSettings(widgetId) {
 		const widget = widgets.find(w => w.id === widgetId)
 		if (widget) {
 			setSelectedWidget(widget)
@@ -155,33 +145,28 @@ export default function Dashboard() {
 		}
 	}
 
-	const handleDebugStorage = () => {
-		console.log("=== DEBUG STORAGE ===")
-		console.log("Current widgets from Redux:", widgets)
-		console.log("Widgets in localStorage:", localStorage.getItem('finboard_widgets'))
-		console.log("Settings in localStorage:", localStorage.getItem('finboard_settings'))
-		console.log("Layout in localStorage:", localStorage.getItem('finboard_layout'))
-
-		// Check all localStorage keys related to finboard
+	// Clear all data
+	function handleClearData() {
 		const allKeys = Object.keys(localStorage).filter(key => key.includes('finboard'))
-		console.log("All finboard localStorage keys:", allKeys)
-		allKeys.forEach(key => {
-			console.log(`${key}:`, localStorage.getItem(key))
-		})
-
-		// Clear all localStorage and reload
-		console.log("🧹 Clearing localStorage and reloading...")
 		allKeys.forEach(key => localStorage.removeItem(key))
 		window.location.reload()
 	}
 
+	// Find the widget being dragged
 	const activeWidget = widgets.find((widget) => widget.id === activeId)
 
-	// Prevent hydration mismatch by not rendering DnD components until mounted
+	// Calculate subtitle text
+	let subtitle = "Real-time financial data"
+	if (widgets.length > 0) {
+		subtitle = `${widgets.length} active widget${widgets.length !== 1 ? "s" : ""} • ${autoRefresh ? "Auto-refresh enabled" : "Manual refresh"}`
+	} else if (dashboardSettings?.subtitle) {
+		subtitle = dashboardSettings.subtitle
+	}
+
+	// Show loading screen while mounting
 	if (!isMounted) {
 		return (
 			<div className="min-h-screen bg-slate-900 text-white">
-				{/* Header */}
 				<header className="border-b border-slate-700 bg-slate-800/50">
 					<div className="flex items-center justify-between px-6 py-4">
 						<div className="flex items-center gap-3">
@@ -189,22 +174,18 @@ export default function Dashboard() {
 								<BarChart3 className="w-5 h-5 text-white" />
 							</div>
 							<div>
-								<h1 className="text-xl font-semibold text-white">
-									{isMounted ? (dashboardSettings?.title || "Finance Dashboard") : "Finance Dashboard"}
-								</h1>
-								<p className="text-sm text-slate-400">
-									{subtitle}
-								</p>
+								<h1 className="text-xl font-semibold text-white">Finance Dashboard</h1>
+								<p className="text-sm text-slate-400">Loading...</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
 							<Button
 								variant="outline"
 								size="sm"
-								onClick={handleDebugStorage}
+								onClick={handleClearData}
 								className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
 							>
-								Clear Cache & Reload
+								Clear Cache
 							</Button>
 							<Button onClick={handleAddWidget} className="bg-teal-500 hover:bg-teal-600 text-white">
 								<Plus className="w-4 h-4 mr-2" />
@@ -213,8 +194,6 @@ export default function Dashboard() {
 						</div>
 					</div>
 				</header>
-
-				{/* Loading state */}
 				<main className="p-6">
 					<div className="flex items-center justify-center min-h-[500px]">
 						<div className="text-center space-y-4">
@@ -227,6 +206,7 @@ export default function Dashboard() {
 		)
 	}
 
+	// Main dashboard UI
 	return (
 		<div className="min-h-screen bg-slate-900 text-white">
 			{/* Header */}
@@ -238,14 +218,9 @@ export default function Dashboard() {
 						</div>
 						<div>
 							<h1 className="text-xl font-semibold text-white">
-								{isMounted ? (dashboardSettings?.title || "Finance Dashboard") : "Finance Dashboard"}
+								{dashboardSettings?.title || "Finance Dashboard"}
 							</h1>
-							<p className="text-sm text-slate-400">
-								{widgets.length > 0
-									? `${widgets.length} active widget${widgets.length !== 1 ? "s" : ""} • ${autoRefresh ? "Auto-refresh enabled" : "Manual refresh"
-									}`
-									: dashboardSettings?.subtitle || "Real-time financial data"}
-							</p>
+							<p className="text-sm text-slate-400">{subtitle}</p>
 						</div>
 					</div>
 					<div className="flex items-center gap-2">
@@ -260,6 +235,7 @@ export default function Dashboard() {
 			{/* Main Content */}
 			<main className="p-6">
 				{widgets.length === 0 ? (
+					// Show empty state when no widgets
 					<div className="flex flex-col items-center justify-center min-h-[500px] text-center">
 						<div className="flex items-center justify-center w-20 h-20 bg-slate-700 rounded-full mb-6">
 							<BarChart3 className="w-10 h-10 text-slate-400" />
@@ -269,8 +245,6 @@ export default function Dashboard() {
 							Create custom widgets by connecting to any finance API. Track stocks, crypto, forex, or economic
 							indicators - all in real time.
 						</p>
-
-						{/* Add Widget Card */}
 						<Card
 							onClick={handleAddWidget}
 							className="w-80 bg-slate-800 border-2 border-dashed border-teal-500/50 hover:border-teal-500 transition-all duration-200 cursor-pointer hover:bg-slate-700/50"
@@ -287,77 +261,16 @@ export default function Dashboard() {
 						</Card>
 					</div>
 				) : (
-					widgets.length > 0 ? (
-						<DndContext
-							sensors={sensors}
-							collisionDetection={closestCenter}
-							onDragStart={handleDragStart}
-							onDragEnd={handleDragEnd}
-							modifiers={[restrictToWindowEdges]}
-						>
-							<div className="space-y-6">
-								{/* Search and Controls */}
-								<div className="flex items-center justify-between">
-									<div className="relative w-80">
-										<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-										<Input
-											placeholder="Search widgets..."
-											value={searchQuery}
-											onChange={(e) => setSearchQuery(e.target.value)}
-											className="pl-10 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-teal-500"
-										/>
-									</div>
-									<div className="flex items-center gap-4">
-										{isLoading && (
-											<div className="flex items-center gap-2 text-sm text-slate-400">
-												<Spinner size="sm" />
-												Refreshing data...
-											</div>
-										)}
-										<div className="text-sm text-slate-400">{widgets.length} widgets</div>
-									</div>
-								</div>
-
-								{/* Widgets Grid with Drag & Drop */}
-								<SortableContext items={widgets.map((w) => w.id)} strategy={verticalListSortingStrategy}>
-									<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-										{widgets.map((widget) => (
-											<DraggableWidget
-												key={widget.id}
-												widget={widget}
-												searchQuery={searchQuery}
-												onSettings={() => handleWidgetSettings(widget.id)}
-												onRemove={() => handleRemoveWidget(widget.id)}
-											/>
-										))}
-									</div>
-								</SortableContext>
-
-								{/* Add Widget Card */}
-								<DroppableArea onAddWidget={handleAddWidget} isOver={false} />
-							</div>
-
-							{/* Drag Overlay */}
-							<DragOverlay modifiers={[restrictToWindowEdges]}>
-								{activeWidget ? (
-									<div className="transform rotate-3 scale-105">
-										<WidgetCard
-											title={activeWidget.title}
-											onSettings={() => { }}
-											onRemove={() => { }}
-											loading={activeWidget.loading}
-											error={activeWidget.error}
-											lastUpdated={activeWidget.lastUpdated}
-											isDragging={true}
-										>
-											<WidgetRenderer widget={activeWidget} searchQuery={searchQuery} />
-										</WidgetCard>
-									</div>
-								) : null}
-							</DragOverlay>
-						</DndContext>
-					) : (
+					// Show widgets when we have them
+					<DndContext
+						sensors={sensors}
+						collisionDetection={closestCenter}
+						onDragStart={handleDragStart}
+						onDragEnd={handleDragEnd}
+						modifiers={[restrictToWindowEdges]}
+					>
 						<div className="space-y-6">
+							{/* Search bar and info */}
 							<div className="flex items-center justify-between">
 								<div className="relative w-80">
 									<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -368,21 +281,65 @@ export default function Dashboard() {
 										className="pl-10 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-teal-500"
 									/>
 								</div>
+								<div className="flex items-center gap-4">
+									{isLoading && (
+										<div className="flex items-center gap-2 text-sm text-slate-400">
+											<Spinner size="sm" />
+											Refreshing data...
+										</div>
+									)}
+									<div className="text-sm text-slate-400">{widgets.length} widgets</div>
+								</div>
 							</div>
+
+							{/* Widgets grid */}
+							<SortableContext items={widgets.map((w) => w.id)} strategy={verticalListSortingStrategy}>
+								<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+									{widgets.map((widget) => (
+										<DraggableWidget
+											key={widget.id}
+											widget={widget}
+											searchQuery={searchQuery}
+											onSettings={() => handleWidgetSettings(widget.id)}
+											onRemove={() => handleRemoveWidget(widget.id)}
+										/>
+									))}
+								</div>
+							</SortableContext>
+
+							{/* Add more widgets area */}
 							<DroppableArea onAddWidget={handleAddWidget} isOver={false} />
 						</div>
-					)
+
+						{/* Drag preview */}
+						<DragOverlay modifiers={[restrictToWindowEdges]}>
+							{activeWidget ? (
+								<div className="transform rotate-3 scale-105">
+									<WidgetCard
+										title={activeWidget.title}
+										onSettings={() => { }}
+										onRemove={() => { }}
+										loading={activeWidget.loading}
+										error={activeWidget.error}
+										lastUpdated={activeWidget.lastUpdated}
+										isDragging={true}
+									>
+										<WidgetRenderer widget={activeWidget} searchQuery={searchQuery} />
+									</WidgetCard>
+								</div>
+							) : null}
+						</DragOverlay>
+					</DndContext>
 				)}
 			</main>
 
-			{/* Add Widget Modal */}
+			{/* Modals */}
 			<AddWidgetModal
 				isOpen={showAddModal}
 				onClose={() => setShowAddModal(false)}
 				onCreateWidget={handleCreateWidget}
 			/>
 
-			{/* Widget Settings Modal */}
 			<WidgetSettingsModal
 				isOpen={showSettingsModal}
 				onClose={() => {

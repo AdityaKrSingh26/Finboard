@@ -18,180 +18,56 @@ import {
 	Code,
 	Download,
 	Play,
-	Settings,
-	Eye,
-	Filter
+	Eye
 } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
 import { testApiConnection, selectApiTestResult, selectApiTesting, clearApiTestResult } from "@/lib/store/slices/widgets-slice"
-import { DataService } from "@/lib/data-service"
+import { coinGeckoClient } from "@/lib/api/coingecko-client"
+import { exchangeRateClient } from "@/lib/api/exchange-rate-client"
+import { finnhubClient } from "@/lib/api/finnhub-client"
 
-// Sample API responses for different endpoints
-const SAMPLE_API_RESPONSES = {
+// Available API endpoints for different data types
+const apiEndpoints = {
 	stocks: {
-		"Alpha Vantage - Stock Quote": {
-			"Global Quote": {
-				"01. symbol": "AAPL",
-				"02. open": "174.24",
-				"03. high": "176.54",
-				"04. low": "173.11",
-				"05. price": "175.43",
-				"06. volume": "48567234",
-				"07. latest trading day": "2024-01-15",
-				"08. previous close": "175.23",
-				"09. change": "0.20",
-				"10. change percent": "0.11%"
-			}
+		"Finnhub - Popular Stocks": async () => {
+			const data = await finnhubClient.getPopularStocks()
+			return data
 		},
-		"Finnhub - Real-time Quote": {
-			"c": 175.43,
-			"d": 0.20,
-			"dp": 0.11,
-			"h": 176.54,
-			"l": 173.11,
-			"o": 174.24,
-			"pc": 175.23,
-			"t": 1642204800
+		"Finnhub - Tech Stocks": async () => {
+			const data = await finnhubClient.getTechStocks()
+			return data
 		},
-		"Yahoo Finance - Stock Data": {
-			"symbol": "AAPL",
-			"regularMarketPrice": 175.43,
-			"regularMarketChange": 0.20,
-			"regularMarketChangePercent": 0.11,
-			"regularMarketTime": 1642204800,
-			"regularMarketDayHigh": 176.54,
-			"regularMarketDayLow": 173.11,
-			"regularMarketOpen": 174.24,
-			"regularMarketPreviousClose": 175.23,
-			"regularMarketVolume": 48567234,
-			"marketCap": 2875542323200,
-			"fiftyTwoWeekLow": 124.17,
-			"fiftyTwoWeekHigh": 182.94,
-			"dividendYield": 0.0044,
-			"peRatio": 29.12,
-			"longName": "Apple Inc.",
-			"currency": "USD",
-			"exchangeName": "NMS"
+		"Finnhub - S&P 500 Top": async () => {
+			const data = await finnhubClient.getSP500Top()
+			return data
 		}
 	},
 	crypto: {
-		"CoinGecko - Market Data": {
-			"id": "bitcoin",
-			"symbol": "btc",
-			"name": "Bitcoin",
-			"image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
-			"current_price": 43250.75,
-			"market_cap": 847523456789,
-			"market_cap_rank": 1,
-			"fully_diluted_valuation": 908234567890,
-			"total_volume": 23456789012,
-			"high_24h": 44123.45,
-			"low_24h": 42789.12,
-			"price_change_24h": 567.89,
-			"price_change_percentage_24h": 1.33,
-			"market_cap_change_24h": 12345678901,
-			"market_cap_change_percentage_24h": 1.48,
-			"circulating_supply": 19567234.5,
-			"total_supply": 21000000,
-			"max_supply": 21000000,
-			"ath": 69045,
-			"ath_change_percentage": -37.35,
-			"ath_date": "2021-11-10T14:24:11.849Z",
-			"atl": 67.81,
-			"atl_change_percentage": 63654.12,
-			"atl_date": "2013-07-06T00:00:00.000Z",
-			"last_updated": "2024-01-15T10:30:00.000Z"
+		"CoinGecko - Market Data": async () => {
+			const data = await coinGeckoClient.getCryptoMarkets('usd', 20)
+			return data
 		},
-		"Coinbase - Exchange Rates": {
-			"data": {
-				"currency": "BTC",
-				"rates": {
-					"AED": "158734.56",
-					"AFN": "3456789.12",
-					"ALL": "4567890.23",
-					"AMD": "17234567.89",
-					"ANG": "78456.78",
-					"AOA": "35678901.23",
-					"ARS": "14567890.12",
-					"AUD": "64321.45",
-					"AWG": "78456.78",
-					"AZN": "73456.78",
-					"USD": "43250.75",
-					"EUR": "39876.54",
-					"GBP": "34123.45"
-				}
-			}
+		"CoinGecko - Trending": async () => {
+			const data = await coinGeckoClient.getTrendingCrypto()
+			return data
+		},
+		"CoinGecko - Bitcoin": async () => {
+			const data = await coinGeckoClient.getCryptoData('bitcoin')
+			return data
 		}
 	},
 	forex: {
-		"Exchange Rate API": {
-			"result": "success",
-			"documentation": "https://www.exchangerate-api.com/docs",
-			"terms_of_use": "https://www.exchangerate-api.com/terms",
-			"time_last_update_unix": 1642204800,
-			"time_last_update_utc": "Mon, 15 Jan 2024 00:00:01 +0000",
-			"time_next_update_unix": 1642291200,
-			"time_next_update_utc": "Tue, 16 Jan 2024 00:00:01 +0000",
-			"base_code": "USD",
-			"conversion_rates": {
-				"USD": 1,
-				"AED": 3.6725,
-				"AFN": 88.502,
-				"ALL": 108.45,
-				"AMD": 404.12,
-				"EUR": 0.8456,
-				"GBP": 0.7892,
-				"JPY": 149.25,
-				"CNY": 7.2345,
-				"INR": 83.1234,
-				"CAD": 1.3456,
-				"AUD": 1.5234,
-				"CHF": 0.8765,
-				"SEK": 10.5432,
-				"NOK": 10.8765
-			}
-		}
-	},
-	custom: {
-		"Generic API Response": {
-			"status": "success",
-			"data": {
-				"items": [
-					{
-						"id": 1,
-						"name": "Sample Item 1",
-						"value": 123.45,
-						"category": "A",
-						"active": true,
-						"created_at": "2024-01-15T10:30:00Z",
-						"metadata": {
-							"tags": ["tag1", "tag2"],
-							"priority": "high",
-							"score": 85.7
-						}
-					},
-					{
-						"id": 2,
-						"name": "Sample Item 2", 
-						"value": 67.89,
-						"category": "B",
-						"active": false,
-						"created_at": "2024-01-14T15:45:00Z",
-						"metadata": {
-							"tags": ["tag3"],
-							"priority": "medium",
-							"score": 72.3
-						}
-					}
-				],
-				"pagination": {
-					"total": 150,
-					"page": 1,
-					"per_page": 20,
-					"total_pages": 8
-				}
-			},
-			"timestamp": "2024-01-15T10:30:00Z"
+		"Exchange Rate - USD Rates": async () => {
+			const data = await exchangeRateClient.getLatestRates('USD')
+			return data
+		},
+		"Exchange Rate - Popular Pairs": async () => {
+			const data = await exchangeRateClient.getPopularForexPairs()
+			return data
+		},
+		"Exchange Rate - EUR Rates": async () => {
+			const data = await exchangeRateClient.getLatestRates('EUR')
+			return data
 		}
 	}
 }
@@ -208,140 +84,186 @@ export default function ApiResponseExplorer({
 	const apiTestResult = useAppSelector(selectApiTestResult)
 	const apiTesting = useAppSelector(selectApiTesting)
 
-	const [apiUrl, setApiUrl] = useState(initialUrl)
-	const [selectedSample, setSelectedSample] = useState("")
-	const [apiResponse, setApiResponse] = useState(null)
+	// Simple state variables
+	const [url, setUrl] = useState(initialUrl)
+	const [selectedEndpoint, setSelectedEndpoint] = useState("")
+	const [responseData, setResponseData] = useState(null)
 	const [selectedFields, setSelectedFields] = useState([])
-	const [isTestingCustom, setIsTestingCustom] = useState(false)
-	const [customTestResult, setCustomTestResult] = useState(null)
+	const [testing, setTesting] = useState(false)
+	const [testResult, setTestResult] = useState(null)
+	const [loadingApi, setLoadingApi] = useState(false)
 
-	// Load sample data based on data source
+	// Load API data when modal opens
 	useEffect(() => {
 		if (isOpen) {
-			const samples = SAMPLE_API_RESPONSES[dataSource] || SAMPLE_API_RESPONSES.custom
-			const firstSampleKey = Object.keys(samples)[0]
-			if (firstSampleKey) {
-				setSelectedSample(firstSampleKey)
-				setApiResponse(samples[firstSampleKey])
-			}
+			loadDefaultApiData()
 		}
 	}, [isOpen, dataSource])
 
-	// Handle sample selection
-	const handleSampleSelect = (sampleName) => {
-		const samples = SAMPLE_API_RESPONSES[dataSource] || SAMPLE_API_RESPONSES.custom
-		setSelectedSample(sampleName)
-		setApiResponse(samples[sampleName])
-		setSelectedFields([])
+	// Load default API data for the data source
+	async function loadDefaultApiData() {
+		const endpoints = apiEndpoints[dataSource] || apiEndpoints.crypto
+		const endpointNames = Object.keys(endpoints)
+		if (endpointNames.length > 0) {
+			const firstEndpoint = endpointNames[0]
+			await loadApiData(firstEndpoint)
+		}
 	}
 
-	// Test custom API URL
-	const handleTestApi = async () => {
-		if (!apiUrl.trim()) return
+	// Load data from a specific API endpoint
+	async function loadApiData(endpointName) {
+		setLoadingApi(true)
+		setSelectedEndpoint(endpointName)
+		
+		try {
+			const endpoints = apiEndpoints[dataSource] || apiEndpoints.crypto
+			const apiFunction = endpoints[endpointName]
+			
+			if (apiFunction) {
+				const data = await apiFunction()
+				setResponseData(data)
+				setSelectedFields([])
+				setTestResult({
+					success: true,
+					message: `${endpointName} data loaded successfully!`
+				})
+			}
+		} catch (error) {
+			setTestResult({
+				success: false,
+				message: error.message || `Failed to load ${endpointName} data`
+			})
+			setResponseData(null)
+		} finally {
+			setLoadingApi(false)
+		}
+	}
 
-		setIsTestingCustom(true)
-		setCustomTestResult(null)
+	// Test the API URL
+	async function testApi() {
+		if (!url.trim()) {
+			return
+		}
+
+		setTesting(true)
+		setTestResult(null)
 
 		try {
-			// First test the connection
-			dispatch(testApiConnection({ url: apiUrl }))
-
-			// Try to fetch actual data (simulation for now)
-			await new Promise(resolve => setTimeout(resolve, 1500))
-
-			// For demo, use sample data based on URL pattern
-			let responseData
-			if (apiUrl.toLowerCase().includes('stock') || apiUrl.toLowerCase().includes('finance')) {
-				responseData = SAMPLE_API_RESPONSES.stocks["Yahoo Finance - Stock Data"]
-			} else if (apiUrl.toLowerCase().includes('crypto') || apiUrl.toLowerCase().includes('coin')) {
-				responseData = SAMPLE_API_RESPONSES.crypto["CoinGecko - Market Data"]
-			} else if (apiUrl.toLowerCase().includes('forex') || apiUrl.toLowerCase().includes('exchange')) {
-				responseData = SAMPLE_API_RESPONSES.forex["Exchange Rate API"]
-			} else {
-				responseData = SAMPLE_API_RESPONSES.custom["Generic API Response"]
+			// Make actual API call
+			const response = await fetch(url)
+			
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`)
 			}
-
-			setApiResponse(responseData)
+			
+			const data = await response.json()
+			
+			setResponseData(data)
 			setSelectedFields([])
-			setCustomTestResult({
+			setTestResult({
 				success: true,
 				message: "API connected successfully! Response data loaded.",
 				responseTime: Math.floor(Math.random() * 500 + 200)
 			})
 
 		} catch (error) {
-			setCustomTestResult({
+			setTestResult({
 				success: false,
 				message: error.message || "Failed to connect to API"
 			})
 		} finally {
-			setIsTestingCustom(false)
+			setTesting(false)
 		}
 	}
 
-	// Handle field selection changes
-	const handleFieldsChange = (fields) => {
+	// When fields change
+	function onFieldsChange(fields) {
 		setSelectedFields(fields)
 	}
 
-	// Save selected fields
-	const handleSaveFields = () => {
+	// Save the selected fields
+	function saveFields() {
 		onFieldsSelected?.({
 			fields: selectedFields,
-			apiUrl: apiUrl || null,
-			sampleData: apiResponse,
-			dataSource: selectedSample || "custom"
+			apiUrl: url || null,
+			responseData: responseData,
+			dataSource: selectedEndpoint || "api"
 		})
 		onClose()
 	}
 
-	// Auto-suggest fields based on widget type
-	const getAutoSuggestedFields = () => {
-		if (!apiResponse) return []
-
-		const suggestions = {
-			table: ["symbol", "name", "price", "change", "volume", "market_cap", "current_price", "regularMarketPrice"],
-			card: ["name", "symbol", "price", "current_price", "change", "change_percent", "regularMarketPrice"],
-			chart: ["date", "time", "open", "high", "low", "close", "volume", "timestamp"]
+	// Get suggested fields for different widget types
+	function getSuggestedFields() {
+		if (!responseData) {
+			return []
 		}
 
-		const targetFields = suggestions[widgetType] || suggestions.table
-		const flatFields = flattenObjectPaths(apiResponse)
+		// Fields that work well for different widget types
+		let goodFields = []
+		if (widgetType === "table") {
+			goodFields = ["symbol", "name", "price", "change", "volume", "market_cap", "current_price", "regularMarketPrice"]
+		} else if (widgetType === "card") {
+			goodFields = ["name", "symbol", "price", "current_price", "change", "change_percent", "regularMarketPrice"]
+		} else if (widgetType === "chart") {
+			goodFields = ["date", "time", "open", "high", "low", "close", "volume", "timestamp"]
+		} else {
+			goodFields = ["symbol", "name", "price", "change", "volume", "market_cap", "current_price", "regularMarketPrice"]
+		}
+
+		const allFields = getAllFieldPaths(responseData)
 		
-		return targetFields.filter(target => 
-			flatFields.some(field => 
-				field.toLowerCase().includes(target.toLowerCase()) ||
-				target.toLowerCase().includes(field.toLowerCase())
-			)
-		).slice(0, 6)
+		let suggestions = []
+		for (let i = 0; i < goodFields.length; i++) {
+			const target = goodFields[i]
+			for (let j = 0; j < allFields.length; j++) {
+				const field = allFields[j]
+				if (field.toLowerCase().includes(target.toLowerCase()) ||
+					target.toLowerCase().includes(field.toLowerCase())) {
+					suggestions.push(field)
+					break
+				}
+			}
+		}
+		
+		// Only return first 6 suggestions
+		return suggestions.slice(0, 6)
 	}
 
-	// Helper to flatten object paths
-	const flattenObjectPaths = (obj, prefix = "") => {
+	// Get all possible field paths from an object
+	function getAllFieldPaths(obj, prefix = "") {
 		let paths = []
 		
 		if (Array.isArray(obj)) {
 			if (obj.length > 0) {
-				paths = paths.concat(flattenObjectPaths(obj[0], prefix))
+				const firstItem = obj[0]
+				const subPaths = getAllFieldPaths(firstItem, prefix)
+				paths = paths.concat(subPaths)
 			}
 		} else if (typeof obj === "object" && obj !== null) {
-			Object.entries(obj).forEach(([key, value]) => {
+			const keys = Object.keys(obj)
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i]
+				const value = obj[key]
 				const path = prefix ? `${prefix}.${key}` : key
 				paths.push(path)
 				
 				if (typeof value === "object" && value !== null) {
-					paths = paths.concat(flattenObjectPaths(value, path))
+					const subPaths = getAllFieldPaths(value, path)
+					paths = paths.concat(subPaths)
 				}
-			})
+			}
 		}
 		
 		return paths
 	}
 
-	const autoSuggestedFields = getAutoSuggestedFields()
-	const availableSamples = SAMPLE_API_RESPONSES[dataSource] || SAMPLE_API_RESPONSES.custom
+	const suggestedFields = getSuggestedFields()
+	const availableEndpoints = apiEndpoints[dataSource] || apiEndpoints.crypto
 
-	if (!isOpen) return null
+	// Don't show modal if closed
+	if (!isOpen) {
+		return null
+	}
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
@@ -362,9 +284,9 @@ export default function ApiResponseExplorer({
 				</DialogHeader>
 
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
-					{/* Left Panel - API Configuration */}
+					{/* Left side - API settings */}
 					<div className="space-y-4 overflow-y-auto max-h-[calc(95vh-120px)]">
-						{/* Custom API URL */}
+						{/* Custom API URL section */}
 						<Card className="bg-slate-800 border-slate-700">
 							<CardHeader className="pb-3">
 								<CardTitle className="text-sm text-white flex items-center gap-2">
@@ -377,19 +299,19 @@ export default function ApiResponseExplorer({
 									<Label htmlFor="apiUrl" className="text-slate-300">API URL</Label>
 									<Input
 										id="apiUrl"
-										placeholder="https://api.example.com/data"
-										value={apiUrl}
-										onChange={(e) => setApiUrl(e.target.value)}
+										placeholder="Enter your API endpoint URL"
+										value={url}
+										onChange={(e) => setUrl(e.target.value)}
 										className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
 									/>
 								</div>
 								<div className="flex items-center gap-3">
 									<Button
-										onClick={handleTestApi}
-										disabled={!apiUrl.trim() || isTestingCustom}
+										onClick={testApi}
+										disabled={!url.trim() || testing}
 										className="bg-teal-500 hover:bg-teal-600 text-white disabled:opacity-50"
 									>
-										{isTestingCustom ? (
+										{testing ? (
 											<>
 												<ApiLoader size="sm" className="mr-2" />
 												Testing...
@@ -402,52 +324,62 @@ export default function ApiResponseExplorer({
 										)}
 									</Button>
 
-									{customTestResult && (
+									{testResult && (
 										<div className={`flex items-center gap-2 text-sm ${
-											customTestResult.success ? "text-green-400" : "text-red-400"
+											testResult.success ? "text-green-400" : "text-red-400"
 										}`}>
-											{customTestResult.success ? (
+											{testResult.success ? (
 												<CheckCircle className="w-4 h-4" />
 											) : (
 												<AlertCircle className="w-4 h-4" />
 											)}
-											{customTestResult.message}
+											{testResult.message}
 										</div>
 									)}
 								</div>
 							</CardContent>
 						</Card>
 
-						{/* Sample APIs */}
+						{/* Live APIs */}
 						<Card className="bg-slate-800 border-slate-700">
 							<CardHeader className="pb-3">
 								<CardTitle className="text-sm text-white flex items-center gap-2">
 									<Code className="w-4 h-4" />
-									Sample API Responses
+									Live API Endpoints
 								</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-2">
-								{Object.keys(availableSamples).map((sampleName) => (
+								{Object.keys(availableEndpoints).map((endpointName) => (
 									<Button
-										key={sampleName}
-										variant={selectedSample === sampleName ? "default" : "outline"}
+										key={endpointName}
+										variant={selectedEndpoint === endpointName ? "default" : "outline"}
 										size="sm"
-										onClick={() => handleSampleSelect(sampleName)}
+										onClick={() => loadApiData(endpointName)}
+										disabled={loadingApi}
 										className={`w-full text-left justify-start ${
-											selectedSample === sampleName
+											selectedEndpoint === endpointName
 												? "bg-teal-500 hover:bg-teal-600 text-white"
 												: "bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
 										}`}
 									>
-										<Database className="w-3 h-3 mr-2" />
-										{sampleName}
+										{loadingApi && selectedEndpoint === endpointName ? (
+											<>
+												<ApiLoader size="sm" className="mr-2" />
+												Loading...
+											</>
+										) : (
+											<>
+												<Database className="w-3 h-3 mr-2" />
+												{endpointName}
+											</>
+										)}
 									</Button>
 								))}
 							</CardContent>
 						</Card>
 
-						{/* Auto-suggestions */}
-						{autoSuggestedFields.length > 0 && (
+						{/* Field suggestions */}
+						{suggestedFields.length > 0 && (
 							<Card className="bg-slate-800 border-slate-700">
 								<CardHeader className="pb-3">
 									<CardTitle className="text-sm text-teal-400 flex items-center gap-2">
@@ -457,7 +389,7 @@ export default function ApiResponseExplorer({
 								</CardHeader>
 								<CardContent className="space-y-2">
 									<div className="flex flex-wrap gap-2">
-										{autoSuggestedFields.map((field) => (
+										{suggestedFields.map((field) => (
 											<Button
 												key={field}
 												variant="outline"
@@ -476,7 +408,10 @@ export default function ApiResponseExplorer({
 									<Button
 										variant="outline"
 										size="sm"
-										onClick={() => setSelectedFields([...selectedFields, ...autoSuggestedFields.filter(f => !selectedFields.includes(f))])}
+										onClick={() => {
+											const newFields = suggestedFields.filter(f => !selectedFields.includes(f))
+											setSelectedFields([...selectedFields, ...newFields])
+										}}
 										className="w-full text-xs border-teal-600 text-teal-300 hover:bg-teal-600 hover:text-white"
 									>
 										<CheckCircle className="w-3 h-3 mr-1" />
@@ -486,8 +421,8 @@ export default function ApiResponseExplorer({
 							</Card>
 						)}
 
-						{/* Response Preview */}
-						{apiResponse && (
+						{/* Raw response preview */}
+						{responseData && (
 							<Card className="bg-slate-800 border-slate-700">
 								<CardHeader className="pb-3">
 									<CardTitle className="text-sm text-white flex items-center gap-2">
@@ -497,20 +432,20 @@ export default function ApiResponseExplorer({
 								</CardHeader>
 								<CardContent>
 									<pre className="text-xs text-slate-300 bg-slate-900 p-3 rounded overflow-auto max-h-40">
-										{JSON.stringify(apiResponse, null, 2)}
+										{JSON.stringify(responseData, null, 2)}
 									</pre>
 								</CardContent>
 							</Card>
 						)}
 					</div>
 
-					{/* Right Panel - Field Explorer */}
+					{/* Right side - Field explorer */}
 					<div className="overflow-hidden">
-						{apiResponse ? (
+						{responseData ? (
 							<JsonFieldExplorer
-								data={apiResponse}
+								data={responseData}
 								selectedFields={selectedFields}
-								onFieldsChange={handleFieldsChange}
+								onFieldsChange={onFieldsChange}
 								maxHeight="calc(95vh - 200px)"
 								showPreview={true}
 								enableSearch={true}
@@ -523,17 +458,19 @@ export default function ApiResponseExplorer({
 									<Database className="w-16 h-16 text-slate-500 mx-auto mb-4" />
 									<h3 className="text-lg font-medium text-white mb-2">No API Response</h3>
 									<p className="text-slate-400 mb-4">
-										Test a custom API URL or select a sample response to explore its structure
+										Test a custom API URL or select a live endpoint to explore its structure
 									</p>
 									<Button
 										variant="outline"
 										onClick={() => {
-											const firstSample = Object.keys(availableSamples)[0]
-											if (firstSample) handleSampleSelect(firstSample)
+											const endpointNames = Object.keys(availableEndpoints)
+											if (endpointNames.length > 0) {
+												loadApiData(endpointNames[0])
+											}
 										}}
 										className="border-slate-600 text-slate-300 hover:bg-slate-700"
 									>
-										Load Sample Data
+										Load API Data
 									</Button>
 								</CardContent>
 							</Card>
@@ -541,7 +478,7 @@ export default function ApiResponseExplorer({
 					</div>
 				</div>
 
-				{/* Footer Actions */}
+				{/* Bottom buttons */}
 				<div className="flex justify-between items-center pt-4 border-t border-slate-700">
 					<div className="text-sm text-slate-400">
 						{selectedFields.length > 0 ? (
@@ -562,7 +499,7 @@ export default function ApiResponseExplorer({
 							Cancel
 						</Button>
 						<Button
-							onClick={handleSaveFields}
+							onClick={saveFields}
 							disabled={selectedFields.length === 0}
 							className="bg-teal-500 hover:bg-teal-600 text-white disabled:opacity-50"
 						>
