@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/loader"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Plus, BarChart3, Search } from "lucide-react"
 import WidgetCard from "@/components/dashboard/widget-card"
 import WidgetRenderer from "@/components/widgets/widget-renderer"
@@ -88,8 +89,16 @@ export default function Dashboard() {
 
 	// Load widget data when widgets change
 	useEffect(() => {
+		console.log("📊 Dashboard effect - Loading widget data for widgets:", widgets.map(w => ({
+			id: w.id,
+			title: w.title,
+			hasData: !!w.data,
+			dataSource: w.config?.dataSource
+		})))
+
 		widgets.forEach((widget) => {
 			if (!widget.data) {
+				console.log(`🚀 Fetching data for widget: ${widget.title} (${widget.id})`)
 				dispatch(fetchWidgetData({ widgetId: widget.id, config: widget.config }))
 			}
 		})
@@ -147,7 +156,9 @@ export default function Dashboard() {
 
 	// Clear all data
 	function handleClearData() {
+		console.log("🧹 Clearing all localStorage data")
 		const allKeys = Object.keys(localStorage).filter(key => key.includes('finboard'))
+		console.log("🗑️ Keys to delete:", allKeys)
 		allKeys.forEach(key => localStorage.removeItem(key))
 		window.location.reload()
 	}
@@ -166,28 +177,37 @@ export default function Dashboard() {
 	// Show loading screen while mounting
 	if (!isMounted) {
 		return (
-			<div className="min-h-screen bg-slate-900 text-white">
-				<header className="border-b border-slate-700 bg-slate-800/50">
+			<div className="min-h-screen bg-background text-foreground theme-transition">
+				<header className="border-b border-border bg-card/50">
 					<div className="flex items-center justify-between px-6 py-4">
 						<div className="flex items-center gap-3">
-							<div className="flex items-center justify-center w-8 h-8 bg-teal-500 rounded">
-								<BarChart3 className="w-5 h-5 text-white" />
+							<div className="flex items-center justify-center w-8 h-8 bg-primary rounded">
+								<BarChart3 className="w-5 h-5 text-primary-foreground" />
 							</div>
 							<div>
-								<h1 className="text-xl font-semibold text-white">Finance Dashboard</h1>
-								<p className="text-sm text-slate-400">Loading...</p>
+								<h1 className="text-xl font-semibold text-foreground">Finance Dashboard</h1>
+								<p className="text-sm text-muted-foreground">Loading...</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
+							<ThemeToggle />
+							<Button 
+								variant="outline" 
+								size="sm"
+								onClick={() => window.open('/theme-demo', '_blank')}
+								className="hidden sm:flex"
+							>
+								Theme Demo
+							</Button>
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={handleClearData}
-								className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+								className="border-border text-muted-foreground hover:bg-accent bg-transparent"
 							>
 								Clear Cache
 							</Button>
-							<Button onClick={handleAddWidget} className="bg-teal-500 hover:bg-teal-600 text-white">
+							<Button onClick={handleAddWidget} className="bg-primary hover:bg-primary/90 text-primary-foreground">
 								<Plus className="w-4 h-4 mr-2" />
 								Add Widget
 							</Button>
@@ -198,7 +218,7 @@ export default function Dashboard() {
 					<div className="flex items-center justify-center min-h-[500px]">
 						<div className="text-center space-y-4">
 							<Spinner size="xl" />
-							<div className="text-slate-400 text-lg">Loading dashboard...</div>
+							<div className="text-muted-foreground text-lg">Loading dashboard...</div>
 						</div>
 					</div>
 				</main>
@@ -208,23 +228,32 @@ export default function Dashboard() {
 
 	// Main dashboard UI
 	return (
-		<div className="min-h-screen bg-slate-900 text-white">
+		<div className="min-h-screen bg-background text-foreground theme-transition">
 			{/* Header */}
-			<header className="border-b border-slate-700 bg-slate-800/50">
+			<header className="border-b border-border bg-card/50">
 				<div className="flex items-center justify-between px-6 py-4">
 					<div className="flex items-center gap-3">
-						<div className="flex items-center justify-center w-8 h-8 bg-teal-500 rounded">
-							<BarChart3 className="w-5 h-5 text-white" />
+						<div className="flex items-center justify-center w-8 h-8 bg-primary rounded">
+							<BarChart3 className="w-5 h-5 text-primary-foreground" />
 						</div>
 						<div>
-							<h1 className="text-xl font-semibold text-white">
+							<h1 className="text-xl font-semibold text-foreground">
 								{dashboardSettings?.title || "Finance Dashboard"}
 							</h1>
-							<p className="text-sm text-slate-400">{subtitle}</p>
+							<p className="text-sm text-muted-foreground">{subtitle}</p>
 						</div>
 					</div>
 					<div className="flex items-center gap-2">
-						<Button onClick={handleAddWidget} className="bg-teal-500 hover:bg-teal-600 text-white">
+						<ThemeToggle />
+						<Button 
+							variant="outline" 
+							size="sm"
+							onClick={() => window.open('/theme-demo', '_blank')}
+							className="hidden sm:flex"
+						>
+							Theme Demo
+						</Button>
+						<Button onClick={handleAddWidget} className="bg-primary hover:bg-primary/90 text-primary-foreground">
 							<Plus className="w-4 h-4 mr-2" />
 							Add Widget
 						</Button>
@@ -237,24 +266,24 @@ export default function Dashboard() {
 				{widgets.length === 0 ? (
 					// Show empty state when no widgets
 					<div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-						<div className="flex items-center justify-center w-20 h-20 bg-slate-700 rounded-full mb-6">
-							<BarChart3 className="w-10 h-10 text-slate-400" />
+						<div className="flex items-center justify-center w-20 h-20 bg-muted rounded-full mb-6">
+							<BarChart3 className="w-10 h-10 text-muted-foreground" />
 						</div>
-						<h2 className="text-3xl font-semibold text-white mb-3">Build Your Finance Dashboard</h2>
-						<p className="text-slate-400 mb-8 max-w-lg leading-relaxed">
+						<h2 className="text-3xl font-semibold text-foreground mb-3">Build Your Finance Dashboard</h2>
+						<p className="text-muted-foreground mb-8 max-w-lg leading-relaxed">
 							Create custom widgets by connecting to any finance API. Track stocks, crypto, forex, or economic
 							indicators - all in real time.
 						</p>
 						<Card
 							onClick={handleAddWidget}
-							className="w-80 bg-slate-800 border-2 border-dashed border-teal-500/50 hover:border-teal-500 transition-all duration-200 cursor-pointer hover:bg-slate-700/50"
+							className="w-80 bg-card border-2 border-dashed border-primary/50 hover:border-primary transition-all duration-200 cursor-pointer hover:bg-accent/50"
 						>
 							<CardContent className="flex flex-col items-center justify-center p-10">
-								<div className="flex items-center justify-center w-16 h-16 bg-teal-500 rounded-full mb-4">
-									<Plus className="w-8 h-8 text-white" />
+								<div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
+									<Plus className="w-8 h-8 text-primary-foreground" />
 								</div>
-								<h3 className="text-xl font-medium text-white mb-2">Add Widget</h3>
-								<p className="text-sm text-slate-400 text-center">
+								<h3 className="text-xl font-medium text-foreground mb-2">Add Widget</h3>
+								<p className="text-sm text-muted-foreground text-center">
 									Connect to a finance API and create a custom widget
 								</p>
 							</CardContent>
@@ -273,22 +302,22 @@ export default function Dashboard() {
 							{/* Search bar and info */}
 							<div className="flex items-center justify-between">
 								<div className="relative w-80">
-									<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+									<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
 									<Input
 										placeholder="Search widgets..."
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
-										className="pl-10 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-teal-500"
+										className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
 									/>
 								</div>
 								<div className="flex items-center gap-4">
 									{isLoading && (
-										<div className="flex items-center gap-2 text-sm text-slate-400">
+										<div className="flex items-center gap-2 text-sm text-muted-foreground">
 											<Spinner size="sm" />
 											Refreshing data...
 										</div>
 									)}
-									<div className="text-sm text-slate-400">{widgets.length} widgets</div>
+									<div className="text-sm text-muted-foreground">{widgets.length} widgets</div>
 								</div>
 							</div>
 

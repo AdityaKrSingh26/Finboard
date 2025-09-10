@@ -11,8 +11,8 @@ const localStorageMiddleware = (store) => {
 	return (next) => (action) => {
 		const result = next(action)
 
-		// Save with simple delay to avoid too many writes
-		if (typeof window !== "undefined") {
+		// Only save for specific actions to reduce overhead
+		if (typeof window !== "undefined" && action.type && !action.type.includes('@@redux')) {
 			clearTimeout(saveTimeout)
 			saveTimeout = setTimeout(() => {
 				try {
@@ -23,14 +23,14 @@ const localStorageMiddleware = (store) => {
 					saveSettings(state.settings || {})
 					saveLayout(state.layout || {})
 
-					// Log important save events
+					// Log important save events (only for widget changes)
 					if (action.type.includes('updateWidget') || action.type.includes('addWidget') || action.type.includes('removeWidget')) {
 						console.log("Widget changes saved to localStorage")
 					}
 				} catch (error) {
 					console.warn("Failed to save state to localStorage:", error)
 				}
-			}, 1000) // 1 second delay
+			}, 500) // Reduced delay to 500ms for better responsiveness
 		}
 
 		return result

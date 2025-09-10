@@ -329,8 +329,8 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 			<div className="w-full">
 				{/* Loading header */}
 				<div className="flex items-center justify-between mb-6">
-					<div className="h-6 w-48 bg-slate-700 rounded animate-pulse" />
-					<div className="h-10 w-64 bg-slate-700 rounded animate-pulse" />
+					<div className="h-6 w-48 bg-muted rounded animate-pulse" />
+					<div className="h-10 w-64 bg-muted rounded animate-pulse" />
 				</div>
 
 				{/* Enhanced loading table with proper column count */}
@@ -342,8 +342,8 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 	if (error) {
 		return (
 			<div className="w-full text-center py-12">
-				<div className="text-red-400 mb-2 text-lg">Error loading data</div>
-				<div className="text-slate-500">{error}</div>
+				<div className="text-destructive mb-2 text-lg">Error loading data</div>
+				<div className="text-muted-foreground">{error}</div>
 			</div>
 		)
 	}
@@ -351,9 +351,9 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 	if (!data || data.length === 0) {
 		return (
 			<div className="w-full text-center py-12">
-				<Search className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-				<p className="text-slate-400 text-lg">No data available</p>
-				<p className="text-slate-500">Check your data source configuration</p>
+				<Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+				<p className="text-muted-foreground text-lg">No data available</p>
+				<p className="text-muted-foreground">Check your data source configuration</p>
 			</div>
 		)
 	}
@@ -363,37 +363,37 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 			{/* Header with Search - no duplicate title */}
 			<div className="flex items-center justify-between mb-6 px-6 pt-4">
 				<div className="flex items-center gap-4">
-					<div className="text-sm text-slate-400">
+					<div className="text-sm text-muted-foreground">
 						{processedData.length} companies
 					</div>
 				</div>
 
 				<div className="relative w-80 px-6">
-					<Search className="absolute left-9 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+					<Search className="absolute left-9 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
 					<Input
 						placeholder="Search companies..."
 						value={localSearchQuery}
 						onChange={(e) => setLocalSearchQuery(e.target.value)}
-						className="pl-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-teal-500 h-12 text-base"
+						className="pl-12 bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-primary h-12 text-base"
 					/>
 				</div>
 			</div>
 
 			{/* Full Width Table */}
 			<div className="flex-1 flex flex-col px-6">
-				<div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900 w-full">
+				<div className="overflow-hidden rounded-lg border border-border bg-background w-full theme-transition">
 					{/* Title and Controls Row */}
-					<div className="bg-slate-800 border-b border-slate-700">
+					<div className="bg-card border-b border-border">
 						<div className="grid grid-cols-4 gap-6 px-8 py-4">
 							<div className="col-span-4 flex items-center justify-between">
 								<div className="flex items-center gap-3">
 									<div
 										{...dragHandleProps}
-										className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-700 transition-colors"
+										className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-accent transition-colors"
 									>
-										<GripVertical className="w-4 h-4 text-slate-400" />
+										<GripVertical className="w-4 h-4 text-muted-foreground" />
 									</div>
-									<h3 className="text-lg font-semibold text-white">
+									<h3 className="text-lg font-semibold text-foreground">
 										{title || "Stock Market Overview"}
 									</h3>
 								</div>
@@ -402,7 +402,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 										variant="ghost"
 										size="sm"
 										onClick={onSettings}
-										className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
+										className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
 									>
 										<Settings className="w-4 h-4" />
 									</Button>
@@ -410,7 +410,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 										variant="ghost"
 										size="sm"
 										onClick={onRemove}
-										className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-slate-700"
+										className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-accent"
 									>
 										<X className="w-4 h-4" />
 									</Button>
@@ -420,12 +420,12 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 					</div>
 
 					{/* Table Header */}
-					<div className="bg-slate-800 border-b border-slate-700">
+					<div className="bg-card border-b border-border">
 						<div className="px-8 py-3" style={{ display: 'grid', gridTemplateColumns: tableColumns.map(col => col.width || 'auto').join(' ') }}>
 							{tableColumns.map((column) => (
 								<div
 									key={column.key}
-									className="flex items-center gap-2 text-sm font-semibold text-slate-200 cursor-pointer hover:text-white transition-colors"
+									className="flex items-center gap-2 text-sm font-semibold text-secondary-foreground cursor-pointer hover:text-foreground transition-colors"
 									onClick={() => handleSort(column.key)}
 								>
 									<span>{column.label}</span>
@@ -442,23 +442,23 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 					</div>
 
 					{/* Table Body */}
-					<div className="bg-slate-900">
+					<div className="bg-background">
 						{paginatedData.length === 0 ? (
 							<div className="text-center py-12">
-								<Search className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-								<p className="text-slate-400">No results found</p>
-								<p className="text-slate-500 text-sm">Try adjusting your search</p>
+								<Search className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+								<p className="text-muted-foreground">No results found</p>
+								<p className="text-muted-foreground text-sm">Try adjusting your search</p>
 							</div>
 						) : (
 							paginatedData.map((item, index) => (
 								<div
 									key={startIndex + index}
-									className="px-8 py-2 hover:bg-slate-800/50 transition-colors border-b border-slate-800/50 last:border-b-0"
+									className="px-8 py-2 hover:bg-accent/50 transition-colors border-b border-border/50 last:border-b-0"
 									style={{ display: 'grid', gridTemplateColumns: tableColumns.map(col => col.width || 'auto').join(' ') }}
 								>
 									{tableColumns.map((column) => (
 										<div key={column.key} className="flex items-center justify-start">
-											<span className="text-white font-medium">
+											<span className="text-foreground font-medium">
 												{getCellValue(item, column)}
 											</span>
 										</div>
@@ -468,8 +468,8 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 						)}
 
 						{/* Last Updated Row - inside table */}
-						<div className="grid grid-cols-4 px-8 py-3 bg-slate-800/30 border-t border-slate-700">
-							<div className="col-span-4 flex items-center justify-center gap-2 text-slate-400">
+						<div className="grid grid-cols-4 px-8 py-3 bg-muted/30 border-t border-border">
+							<div className="col-span-4 flex items-center justify-center gap-2 text-muted-foreground">
 								<Clock className="w-4 h-4" />
 								<span className="text-sm">
 									Last updated: {widget.lastUpdated
@@ -487,7 +487,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 								<Button
 									variant="ghost"
 									size="sm"
-									className="ml-2 h-6 px-2 text-slate-400 hover:text-white"
+									className="ml-2 h-6 px-2 text-muted-foreground hover:text-foreground"
 									onClick={() => window.location.reload()}
 								>
 									<RefreshCw className="w-3 h-3" />
@@ -500,7 +500,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 				{/* Pagination */}
 				{totalPages > 1 && (
 					<div className="flex items-center justify-between mt-6 px-6">
-						<div className="text-slate-400">
+						<div className="text-muted-foreground">
 							Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, processedData.length)} of {processedData.length} results
 						</div>
 						<div className="flex items-center gap-2">
@@ -508,7 +508,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 								variant="outline"
 								onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
 								disabled={currentPage === 1}
-								className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent disabled:opacity-50"
+								className="border-border text-muted-foreground hover:bg-accent bg-transparent disabled:opacity-50"
 							>
 								Previous
 							</Button>
@@ -532,8 +532,8 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 											variant={currentPage === pageNum ? "default" : "outline"}
 											onClick={() => setCurrentPage(pageNum)}
 											className={`w-10 h-10 p-0 ${currentPage === pageNum
-													? "bg-teal-500 hover:bg-teal-600 text-white"
-													: "border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+													? "bg-primary hover:bg-primary/90 text-primary-foreground"
+													: "border-border text-muted-foreground hover:bg-accent bg-transparent"
 												}`}
 										>
 											{pageNum}
@@ -546,7 +546,7 @@ export default function TableWidget({ widget, searchQuery = "", dragHandleProps,
 								variant="outline"
 								onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
 								disabled={currentPage === totalPages}
-								className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent disabled:opacity-50"
+								className="border-border text-muted-foreground hover:bg-accent bg-transparent disabled:opacity-50"
 							>
 								Next
 							</Button>

@@ -267,16 +267,16 @@ export default function ApiResponseExplorer({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden bg-slate-900 border-slate-700">
+			<DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden bg-background border-border">
 				<DialogHeader>
-					<DialogTitle className="text-xl text-white flex items-center gap-2">
+					<DialogTitle className="text-xl text-foreground flex items-center gap-2">
 						<Database className="w-5 h-5" />
 						Interactive JSON Field Explorer
 						<Button
 							variant="ghost"
 							size="sm"
 							onClick={onClose}
-							className="ml-auto text-slate-400 hover:text-white"
+							className="ml-auto text-muted-foreground hover:text-foreground"
 						>
 							<X className="w-4 h-4" />
 						</Button>
@@ -287,29 +287,29 @@ export default function ApiResponseExplorer({
 					{/* Left side - API settings */}
 					<div className="space-y-4 overflow-y-auto max-h-[calc(95vh-120px)]">
 						{/* Custom API URL section */}
-						<Card className="bg-slate-800 border-slate-700">
+						<Card className="bg-card border-border">
 							<CardHeader className="pb-3">
-								<CardTitle className="text-sm text-white flex items-center gap-2">
+								<CardTitle className="text-sm text-foreground flex items-center gap-2">
 									<Globe className="w-4 h-4" />
 									Test Custom API
 								</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-3">
 								<div>
-									<Label htmlFor="apiUrl" className="text-slate-300">API URL</Label>
+									<Label htmlFor="apiUrl" className="text-muted-foreground">API URL</Label>
 									<Input
 										id="apiUrl"
 										placeholder="Enter your API endpoint URL"
 										value={url}
 										onChange={(e) => setUrl(e.target.value)}
-										className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+										className="bg-input border-border text-foreground placeholder:text-muted-foreground"
 									/>
 								</div>
 								<div className="flex items-center gap-3">
 									<Button
 										onClick={testApi}
 										disabled={!url.trim() || testing}
-										className="bg-teal-500 hover:bg-teal-600 text-white disabled:opacity-50"
+										className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50"
 									>
 										{testing ? (
 											<>
@@ -341,9 +341,9 @@ export default function ApiResponseExplorer({
 						</Card>
 
 						{/* Live APIs */}
-						<Card className="bg-slate-800 border-slate-700">
+						<Card className="bg-card border-border">
 							<CardHeader className="pb-3">
-								<CardTitle className="text-sm text-white flex items-center gap-2">
+								<CardTitle className="text-sm text-foreground flex items-center gap-2">
 									<Code className="w-4 h-4" />
 									Live API Endpoints
 								</CardTitle>
@@ -359,7 +359,7 @@ export default function ApiResponseExplorer({
 										className={`w-full text-left justify-start ${
 											selectedEndpoint === endpointName
 												? "bg-teal-500 hover:bg-teal-600 text-white"
-												: "bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+												: "bg-muted border-border text-muted-foreground hover:bg-muted/80"
 										}`}
 									>
 										{loadingApi && selectedEndpoint === endpointName ? (

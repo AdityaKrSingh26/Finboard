@@ -23,9 +23,10 @@ export default function RootLayout({ children }) {
 			<body className="font-sans antialiased">
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="dark"
-					enableSystem={false}
+					defaultTheme="system"
+					enableSystem={true}
 					disableTransitionOnChange={false}
+					themes={["light", "dark", "system"]}
 				>
 					<ReduxProvider>
 						<Suspense fallback={

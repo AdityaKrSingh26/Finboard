@@ -188,9 +188,9 @@ export default function WidgetSettingsModal({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+			<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border-border">
 				<DialogHeader>
-					<DialogTitle className="text-xl text-white flex items-center gap-2">
+					<DialogTitle className="text-xl text-foreground flex items-center gap-2">
 						<Settings className="w-5 h-5" />
 						Widget Settings - {widget.title}
 					</DialogTitle>
@@ -198,25 +198,25 @@ export default function WidgetSettingsModal({
 
 				<div className="space-y-6">
 					{/* Basic Settings */}
-					<Card className="p-4 bg-slate-800 border-slate-700">
-						<h3 className="text-lg font-semibold text-white mb-4">Basic Settings</h3>
+					<Card className="p-4 bg-card border-border">
+						<h3 className="text-lg font-semibold text-card-foreground mb-4">Basic Settings</h3>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label className="text-slate-300">Widget Title</Label>
+								<Label className="text-muted-foreground">Widget Title</Label>
 								<Input
 									value={title}
 									onChange={(e) => setTitle(e.target.value)}
-									className="bg-slate-700 border-slate-600 text-white"
+									className="bg-input border-border text-foreground"
 									placeholder="Enter widget title"
 								/>
 							</div>
 							<div>
-								<Label className="text-slate-300">Refresh Time (seconds)</Label>
+								<Label className="text-muted-foreground">Refresh Time (seconds)</Label>
 								<Input
 									type="number"
 									value={refreshTime}
 									onChange={(e) => setRefreshTime(parseInt(e.target.value) || 30)}
-									className="bg-slate-700 border-slate-600 text-white"
+									className="bg-input border-border text-foreground"
 									min="5"
 								/>
 							</div>
@@ -224,8 +224,8 @@ export default function WidgetSettingsModal({
 					</Card>
 
 					{/* Quick Presets */}
-					<Card className="p-4 bg-slate-800 border-slate-700">
-						<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<Card className="p-4 bg-card border-border">
+						<h3 className="text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
 							<Database className="w-5 h-5" />
 							Quick Presets
 						</h3>
@@ -235,7 +235,7 @@ export default function WidgetSettingsModal({
 									key={presetName}
 									variant="outline"
 									onClick={() => usePreset(presetName)}
-									className="bg-slate-700 border-slate-600 hover:bg-slate-600 text-white"
+									className="bg-muted border-border hover:bg-muted/80 text-card-foreground"
 								>
 									{presetName}
 								</Button>
@@ -244,20 +244,20 @@ export default function WidgetSettingsModal({
 					</Card>
 
 					{/* Stock Symbols */}
-					<Card className="p-4 bg-slate-800 border-slate-700">
-						<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<Card className="p-4 bg-card border-border">
+						<h3 className="text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
 							<TrendingUp className="w-5 h-5" />
 							Stock Symbols
 						</h3>
 						<div>
-							<Label className="text-slate-300">Stock Symbols (comma-separated)</Label>
+							<Label className="text-muted-foreground">Stock Symbols (comma-separated)</Label>
 							<Input
 								value={symbols}
 								onChange={(e) => setSymbols(e.target.value)}
-								className="bg-slate-700 border-slate-600 text-white"
+								className="bg-input border-border text-foreground"
 								placeholder="AAPL, GOOGL, MSFT, TSLA, NVDA"
 							/>
-							<p className="text-sm text-slate-400 mt-1">
+							<p className="text-sm text-muted-foreground mt-1">
 								Symbols: {symbols.split(',').filter(s => s.trim()).length}
 							</p>
 						</div>

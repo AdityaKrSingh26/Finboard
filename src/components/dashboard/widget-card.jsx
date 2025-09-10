@@ -20,11 +20,11 @@ export default function WidgetCard({
 	if (isTableWidget) {
 		// For table widgets, render without card container and floating header
 		return (
-			<div className={`relative transition-all duration-200 ${isDragging ? "opacity-50 shadow-2xl ring-2 ring-teal-500/50 rotate-2" : ""
+			<div className={`relative transition-all duration-200 ${isDragging ? "opacity-50 shadow-2xl ring-2 ring-primary/50 rotate-2" : ""
 				}`}>
 				{error ? (
 					<div className="text-center py-4">
-						<p className="text-red-400 text-sm">{error}</p>
+						<p className="text-destructive text-sm">{error}</p>
 					</div>
 				) : (
 					React.cloneElement(children, {
@@ -40,27 +40,27 @@ export default function WidgetCard({
 
 	return (
 		<Card
-			className={`bg-slate-800 border-slate-700 transition-all duration-200 ${isDragging ? "opacity-50 shadow-2xl ring-2 ring-teal-500/50 rotate-2" : "hover:shadow-lg"
+			className={`bg-card border-border theme-transition ${isDragging ? "opacity-50 shadow-2xl ring-2 ring-primary/50 rotate-2" : "hover:shadow-lg"
 				} ${isTableWidget ? "overflow-hidden" : ""}`}
 		>
 			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-				<CardTitle className="text-sm font-medium text-white flex items-center gap-2">
+				<CardTitle className="text-sm font-medium text-card-foreground flex items-center gap-2">
 					<div
 						{...dragHandleProps}
-						className="cursor-grab active:cursor-grabbing p-1 -ml-1 rounded hover:bg-slate-700 transition-colors"
+						className="cursor-grab active:cursor-grabbing p-1 -ml-1 rounded hover:bg-accent transition-colors"
 					>
-						<GripVertical className="w-4 h-4 text-slate-400" />
+						<GripVertical className="w-4 h-4 text-muted-foreground" />
 					</div>
 					{title}
-					{loading && <div className="w-3 h-3 border border-teal-500 border-t-transparent rounded-full animate-spin" />}
-					{error && <AlertCircle className="w-4 h-4 text-red-400" />}
+					{loading && <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />}
+					{error && <AlertCircle className="w-4 h-4 text-destructive" />}
 				</CardTitle>
 				<div className="flex items-center gap-1">
 					<Button
 						variant="ghost"
 						size="sm"
 						onClick={onSettings}
-						className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
+						className="h-8 w-8 p-0 text-muted-foreground hover:text-card-foreground hover:bg-accent"
 					>
 						<Settings className="w-4 h-4" />
 					</Button>
@@ -68,7 +68,7 @@ export default function WidgetCard({
 						variant="ghost"
 						size="sm"
 						onClick={onRemove}
-						className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-slate-700"
+						className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-accent"
 					>
 						<X className="w-4 h-4" />
 					</Button>
@@ -77,7 +77,7 @@ export default function WidgetCard({
 			<CardContent className={isTableWidget ? "p-0" : ""}>
 				{error ? (
 					<div className="text-center py-4">
-						<p className="text-red-400 text-sm">{error}</p>
+						<p className="text-destructive text-sm">{error}</p>
 					</div>
 				) : (
 					<div className={isTableWidget ? "p-4" : ""}>
@@ -85,8 +85,8 @@ export default function WidgetCard({
 					</div>
 				)}
 				{lastUpdated && !isTableWidget && (
-					<div className="pt-2 mt-2 border-t border-slate-600">
-						<p className="text-xs text-slate-400">Last updated: {new Date(lastUpdated).toLocaleTimeString()}</p>
+					<div className="pt-2 mt-2 border-t border-border">
+						<p className="text-xs text-muted-foreground">Last updated: {new Date(lastUpdated).toLocaleTimeString()}</p>
 					</div>
 				)}
 			</CardContent>

@@ -325,7 +325,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 						placeholder="e.g., Stock Market Overview"
 						value={config.title}
 						onChange={(e) => setConfig(prev => ({ ...prev, title: e.target.value }))}
-						className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+						className="bg-input border-border text-foreground placeholder:text-muted-foreground"
 					/>
 				</div>
 
@@ -337,18 +337,18 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 							return (
 								<Card
 									key={type.id}
-									className={`cursor-pointer transition-colors ${config.type === type.id
-											? "bg-teal-500/20 border-teal-500"
-											: "bg-slate-800 border-slate-600 hover:bg-slate-700"
+									className={`cursor-pointer transition-all duration-200 border-2 ${config.type === type.id
+											? "bg-teal-500/10 border-teal-500 shadow-md scale-[1.02]"
+											: "border-border hover:border-teal-300 hover:bg-muted hover:scale-[1.01]"
 										}`}
 									onClick={() => setConfig(prev => ({ ...prev, type: type.id }))}
 								>
 									<CardContent className="p-4">
 										<div className="flex items-center gap-3">
-											<Icon className="w-5 h-5 text-teal-400" />
+											<Icon className={`w-5 h-5 ${config.type === type.id ? "text-teal-500" : "text-muted-foreground"}`} />
 											<div>
-												<div className="font-medium text-white">{type.name}</div>
-												<div className="text-sm text-slate-400">{type.description}</div>
+												<div className="font-medium text-card-foreground">{type.name}</div>
+												<div className="text-sm text-muted-foreground">{type.description}</div>
 											</div>
 										</div>
 									</CardContent>
@@ -373,9 +373,9 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 							return (
 								<Card
 									key={source.id}
-									className={`cursor-pointer transition-colors ${config.dataSource === source.id
-											? "bg-teal-500/20 border-teal-500"
-											: "bg-slate-800 border-slate-600 hover:bg-slate-700"
+									className={`cursor-pointer transition-all duration-200 border-2 ${config.dataSource === source.id
+											? "bg-teal-500/10 border-teal-500 shadow-md scale-[1.02]"
+											: "border-border hover:border-teal-300 hover:bg-muted hover:scale-[1.01]"
 										}`}
 									onClick={() => {
 										setConfig(prev => ({
@@ -388,10 +388,10 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								>
 									<CardContent className="p-4">
 										<div className="flex items-center gap-3">
-											<Icon className="w-5 h-5 text-teal-400" />
+											<Icon className={`w-5 h-5 ${config.dataSource === source.id ? "text-teal-500" : "text-muted-foreground"}`} />
 											<div>
-												<div className="font-medium text-white">{source.name}</div>
-												<div className="text-sm text-slate-400">{source.description}</div>
+												<div className="font-medium text-card-foreground">{source.name}</div>
+												<div className="text-sm text-muted-foreground">{source.description}</div>
 											</div>
 										</div>
 									</CardContent>
@@ -410,7 +410,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								placeholder="Enter your API endpoint URL"
 								value={config.customUrl}
 								onChange={(e) => setConfig(prev => ({ ...prev, customUrl: e.target.value }))}
-								className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+								className="bg-input border-border text-foreground placeholder:text-muted-foreground"
 							/>
 						</div>
 
@@ -420,7 +420,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								size="sm"
 								onClick={testConnection}
 								disabled={!config.customUrl.trim() || apiTesting}
-								className="border-slate-600 text-slate-300 hover:bg-slate-700"
+								className="border-border text-muted-foreground hover:bg-muted"
 							>
 								{apiTesting ? (
 									<Spinner size="sm" className="mr-2" />
@@ -453,16 +453,16 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 		return (
 			<div className="space-y-6">
 				<div className="text-center mb-6">
-					<h3 className="text-lg font-semibold text-white mb-2">Select Data Fields</h3>
-					<p className="text-slate-400 text-sm">
+					<h3 className="text-lg font-semibold text-card-foreground mb-2">Select Data Fields</h3>
+					<p className="text-muted-foreground text-sm">
 						Choose which data fields to display in your widget
 					</p>
 				</div>
 
-				<Card className="bg-slate-800 border-slate-700">
-					<CardContent className="p-4">
+				<Card className="border-border shadow-sm">
+					<CardContent className="p-6">
 						<div className="flex items-center justify-between mb-4">
-							<Label className="text-white text-sm font-medium">Field Selection Method</Label>
+							<Label className="text-card-foreground text-sm font-medium">Field Selection Method</Label>
 							<div className="flex gap-2">
 								<Button
 									variant={!config.useCustomFields ? "default" : "outline"}
@@ -474,7 +474,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 									}))}
 									className={!config.useCustomFields 
 										? "bg-teal-500 hover:bg-teal-600 text-white" 
-										: "border-slate-600 text-slate-300 hover:bg-slate-700"
+										: "border-border text-muted-foreground hover:bg-muted"
 									}
 								>
 									Predefined Fields
@@ -485,7 +485,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 									onClick={() => setConfig(prev => ({ ...prev, useCustomFields: true }))}
 									className={config.useCustomFields 
 										? "bg-teal-500 hover:bg-teal-600 text-white" 
-										: "border-slate-600 text-slate-300 hover:bg-slate-700"
+										: "border-border text-muted-foreground hover:bg-muted"
 									}
 								>
 									<Zap className="w-3 h-3 mr-1" />
@@ -496,19 +496,30 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 
 						{!config.useCustomFields ? (
 							<div className="space-y-3">
-								<p className="text-slate-400 text-xs">
+								<p className="text-muted-foreground text-xs">
 									Select from predefined fields for {currentDataSource?.name || 'this data source'}:
 								</p>
-								<div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+								<div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto">
 									{(currentDataSource?.fields || []).map((field) => (
-										<div key={field} className="flex items-center space-x-2">
+										<div 
+											key={field} 
+											className={`
+												flex items-center p-2 rounded-lg border transition-all duration-200
+												cursor-pointer hover:bg-muted/50
+												${config.fields.includes(field)
+													? 'bg-teal-500/10 border-teal-500 shadow-sm' 
+													: 'border-border hover:border-teal-300'
+												}
+											`}
+											onClick={() => toggleField(field, !config.fields.includes(field))}
+										>
 											<Checkbox
 												id={field}
 												checked={config.fields.includes(field)}
 												onCheckedChange={(checked) => toggleField(field, checked)}
-												className="border-slate-500 data-[state=checked]:bg-teal-500"
+												className="border-border data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500"
 											/>
-											<Label htmlFor={field} className="text-sm text-slate-300 font-mono">
+											<Label htmlFor={field} className="ml-2 text-sm text-card-foreground font-mono cursor-pointer">
 												{field}
 											</Label>
 										</div>
@@ -518,14 +529,14 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 						) : (
 							<div className="space-y-3">
 								<div className="flex items-center justify-between">
-									<p className="text-slate-400 text-xs">
+									<p className="text-muted-foreground text-xs">
 										Use the JSON Field Explorer to select custom fields from API responses:
 									</p>
 									<Button
 										variant="outline"
 										size="sm"
 										onClick={() => setShowExplorer(true)}
-										className="border-teal-600 text-teal-300 hover:bg-teal-600 hover:text-white"
+										className="border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white"
 									>
 										<Search className="w-3 h-3 mr-1" />
 										Explore API Fields
@@ -533,7 +544,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								</div>
 
 								{config.customFields.length > 0 && (
-									<div className="mt-4 p-3 bg-slate-700 rounded border border-slate-600">
+									<div className="mt-4 p-3 bg-muted rounded border border-border">
 										<div className="text-sm text-green-400 mb-2 flex items-center gap-2">
 											<CheckCircle className="w-4 h-4" />
 											Selected Custom Fields ({config.customFields.length})
@@ -542,7 +553,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 											{config.customFields.map((field, index) => (
 												<span
 													key={index}
-													className="px-2 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded text-xs font-mono"
+													className="px-2 py-1 bg-teal-500/20 text-teal-400 border border-teal-500/30 rounded text-xs font-mono"
 												>
 													{field}
 												</span>
@@ -552,12 +563,12 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								)}
 
 								{config.customFields.length === 0 && (
-									<div className="p-4 border border-dashed border-slate-600 rounded text-center">
-										<Database className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-										<p className="text-slate-400 text-sm">
+									<div className="p-4 border border-dashed border-border rounded text-center">
+										<Database className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+										<p className="text-muted-foreground text-sm">
 											No custom fields selected yet
 										</p>
-										<p className="text-slate-500 text-xs mt-1">
+										<p className="text-muted-foreground/60 text-xs mt-1">
 											Click "Explore API Fields" to analyze API responses and select fields
 										</p>
 									</div>
@@ -568,7 +579,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 				</Card>
 
 				{config.fields.length > 0 && (
-					<Card className="bg-slate-800 border-slate-700">
+					<Card className="bg-card border-border">
 						<CardHeader className="pb-3">
 							<CardTitle className="text-sm text-green-400 flex items-center gap-2">
 								<CheckCircle className="w-4 h-4" />
@@ -576,7 +587,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-sm text-slate-300">
+							<div className="text-sm text-card-foreground">
 								<div className="mb-2">
 									<strong>Widget Type:</strong> {config.type.charAt(0).toUpperCase() + config.type.slice(1)}
 								</div>
@@ -590,7 +601,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 									{config.fields.map((field, index) => (
 										<div
 											key={index}
-											className="px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs font-mono text-slate-200"
+											className="px-2 py-1 bg-muted border border-border rounded text-xs font-mono text-muted-foreground"
 										>
 											{field}
 										</div>
@@ -620,7 +631,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 							...prev,
 							refreshInterval: parseInt(e.target.value) || 30
 						}))}
-						className="bg-slate-700 border-slate-600 text-white"
+						className="bg-input border-border text-foreground"
 					/>
 				</div>
 
@@ -638,7 +649,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 									...prev,
 									itemsPerPage: parseInt(e.target.value) || 10
 								}))}
-								className="bg-slate-700 border-slate-600 text-white"
+								className="bg-input border-border text-foreground"
 							/>
 						</div>
 
@@ -651,7 +662,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.enableSearch !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, enableSearch: checked }))}
 									/>
-									<Label htmlFor="enableSearch" className="text-sm text-slate-300">
+									<Label htmlFor="enableSearch" className="text-sm text-muted-foreground">
 										Enable Search
 									</Label>
 								</div>
@@ -661,7 +672,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.enableSorting !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, enableSorting: checked }))}
 									/>
-									<Label htmlFor="enableSorting" className="text-sm text-slate-300">
+									<Label htmlFor="enableSorting" className="text-sm text-muted-foreground">
 										Enable Sorting
 									</Label>
 								</div>
@@ -671,7 +682,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.enablePagination !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, enablePagination: checked }))}
 									/>
-									<Label htmlFor="enablePagination" className="text-sm text-slate-300">
+									<Label htmlFor="enablePagination" className="text-sm text-muted-foreground">
 										Enable Pagination
 									</Label>
 								</div>
@@ -681,7 +692,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.showVolume !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, showVolume: checked }))}
 									/>
-									<Label htmlFor="showVolume" className="text-sm text-slate-300">
+									<Label htmlFor="showVolume" className="text-sm text-muted-foreground">
 										Show Volume
 									</Label>
 								</div>
@@ -702,15 +713,15 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 								].map((type) => (
 									<Card
 										key={type.id}
-										className={`cursor-pointer transition-colors p-3 ${config.cardType === type.id
-												? "bg-teal-500/20 border-teal-500"
-												: "bg-slate-800 border-slate-600 hover:bg-slate-700"
+										className={`cursor-pointer transition-all duration-200 border-2 p-3 ${config.cardType === type.id
+												? "bg-teal-500/10 border-teal-500 shadow-md"
+												: "border-border hover:border-teal-300 hover:bg-muted"
 											}`}
 										onClick={() => setConfig(prev => ({ ...prev, cardType: type.id }))}
 									>
 										<div className="text-center">
-											<div className="font-medium text-white text-sm">{type.name}</div>
-											<div className="text-xs text-slate-400">{type.desc}</div>
+											<div className="font-medium text-card-foreground text-sm">{type.name}</div>
+											<div className="text-xs text-muted-foreground">{type.desc}</div>
 										</div>
 									</Card>
 								))}
@@ -726,7 +737,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.showTrend !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, showTrend: checked }))}
 									/>
-									<Label htmlFor="showTrend" className="text-sm text-slate-300">
+									<Label htmlFor="showTrend" className="text-sm text-muted-foreground">
 										Show Trend
 									</Label>
 								</div>
@@ -736,7 +747,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										checked={config.showPercentage !== false}
 										onCheckedChange={(checked) => setConfig(prev => ({ ...prev, showPercentage: checked }))}
 									/>
-									<Label htmlFor="showPercentage" className="text-sm text-slate-300">
+									<Label htmlFor="showPercentage" className="text-sm text-muted-foreground">
 										Show Percentage
 									</Label>
 								</div>
@@ -761,8 +772,8 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										size="sm"
 										onClick={() => setConfig(prev => ({ ...prev, chartType: type.id }))}
 										className={config.chartType === type.id
-											? "bg-teal-500 hover:bg-teal-600"
-											: "border-slate-600 text-slate-300 hover:bg-slate-700"
+											? "bg-teal-500 hover:bg-teal-600 text-white"
+											: "border-border text-muted-foreground hover:bg-muted"
 										}
 									>
 										{type.name}
@@ -785,8 +796,8 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										size="sm"
 										onClick={() => setConfig(prev => ({ ...prev, timeframe: frame.id }))}
 										className={config.timeframe === frame.id
-											? "bg-teal-500 hover:bg-teal-600"
-											: "border-slate-600 text-slate-300 hover:bg-slate-700"
+											? "bg-teal-500 hover:bg-teal-600 text-white"
+											: "border-border text-muted-foreground hover:bg-muted"
 										}
 									>
 										{frame.name}
@@ -807,7 +818,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 										...prev, 
 										symbol: e.target.value.toUpperCase() 
 									}))}
-									className="bg-slate-700 border-slate-600 text-white"
+									className="bg-input border-border text-foreground"
 								/>
 							</div>
 						)}
@@ -824,15 +835,15 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 
 	return (
 		<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-			<Card className="w-full max-w-2xl bg-slate-800 border-slate-700 text-white max-h-[90vh] overflow-hidden">
+			<Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl">
 				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
 					<div>
-						<CardTitle className="text-xl font-semibold">Add New Widget</CardTitle>
+						<CardTitle className="text-xl font-semibold text-card-foreground">Add New Widget</CardTitle>
 						<div className="flex items-center gap-2 mt-2">
 							{[1, 2, 3, 4].map((stepNum) => (
 								<div
 									key={stepNum}
-									className={`w-6 h-1 rounded-full ${stepNum <= currentStep ? "bg-teal-500" : "bg-slate-600"
+									className={`w-6 h-1 rounded-full transition-colors ${stepNum <= currentStep ? "bg-teal-500" : "bg-muted"
 										}`}
 								/>
 							))}
@@ -842,7 +853,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 						variant="ghost"
 						size="sm"
 						onClick={closeModal}
-						className="text-slate-400 hover:text-white"
+						className="text-muted-foreground hover:text-card-foreground"
 					>
 						<X className="w-4 h-4" />
 					</Button>
@@ -855,11 +866,11 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 					{currentStep === 4 && renderStepFour()}
 				</CardContent>
 
-				<div className="flex justify-between p-6 border-t border-slate-700">
+				<div className="flex justify-between p-6 border-t border-border bg-muted/30">
 					<Button
 						variant="outline"
 						onClick={currentStep === 1 ? closeModal : () => setCurrentStep(currentStep - 1)}
-						className="border-slate-600 text-slate-300 hover:bg-slate-700"
+						className="border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 					>
 						{currentStep === 1 ? "Cancel" : "Back"}
 					</Button>
@@ -868,7 +879,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 						<Button
 							onClick={() => setCurrentStep(currentStep + 1)}
 							disabled={!canGoNext()}
-							className="bg-teal-500 hover:bg-teal-600 text-white disabled:opacity-50"
+							className="bg-teal-500 hover:bg-teal-600 text-white shadow-md transition-all disabled:opacity-50 disabled:hover:bg-teal-500"
 						>
 							Next
 						</Button>
@@ -876,7 +887,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 						<Button
 							onClick={createWidget}
 							disabled={!canGoNext()}
-							className="bg-teal-500 hover:bg-teal-600 text-white disabled:opacity-50"
+							className="bg-teal-500 hover:bg-teal-600 text-white shadow-md transition-all disabled:opacity-50 disabled:hover:bg-teal-500"
 						>
 							Create Widget
 						</Button>

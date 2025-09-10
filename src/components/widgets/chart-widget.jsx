@@ -31,14 +31,32 @@ import {
 	X,
 	ChevronDown
 } from "lucide-react"
+import { useAppDispatch } from "@/lib/store/hooks"
+import { fetchWidgetData } from "@/lib/store/slices/widgets-slice"
 
 export default function ChartWidget({ widget, dragHandleProps, onSettings, onRemove, title }) {
 	const { data, loading, error, config } = widget
 	const [chartType, setChartType] = useState(config?.chartType || "line")
 	const [timeframe, setTimeframe] = useState(config?.timeframe || "daily")
+	const dispatch = useAppDispatch()
+
+	const handleRefreshData = () => {
+		console.log("🔄 Manually refreshing chart data for widget:", widget.id)
+		dispatch(fetchWidgetData({ widgetId: widget.id, config: { ...widget.config, forceRefresh: true } }))
+	}
 
 	// Generate chart data from the widget data
 	const chartData = useMemo(() => {
+		console.log("🔍 Chart Widget Debug:", {
+			title: title || widget.title,
+			data: data,
+			dataType: typeof data,
+			isArray: Array.isArray(data),
+			dataLength: data?.length,
+			firstItem: data?.[0],
+			config: widget.config
+		})
+
 		if (!data || !Array.isArray(data)) return []
 
 		let processedData = [...data]
@@ -525,7 +543,20 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 				<div className="text-center">
 					<BarChart3 className="w-8 h-8 text-slate-400 mx-auto mb-2" />
 					<div className="text-slate-400 text-sm">No chart data available</div>
-					<div className="text-slate-500 text-xs mt-1">Configure your data source to display charts</div>
+					<div className="text-slate-500 text-xs mt-1">
+						{loading ? "Loading chart data..." : 
+						 error ? `Error: ${error}` :
+						 !data ? "No data received from API" :
+						 !Array.isArray(data) ? "Invalid data format received" :
+						 data.length === 0 ? "Empty data set received" :
+						 "Check your data source configuration"}
+					</div>
+					{widget.config?.dataSource && (
+						<div className="text-slate-500 text-xs mt-1">
+							Data Source: {widget.config.dataSource}
+							{widget.config.symbol && ` (${widget.config.symbol})`}
+						</div>
+					)}
 				</div>
 			</div>
 		)
@@ -542,7 +573,7 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 						</div>
 					)}
 					<div>
-						<h3 className="text-lg font-semibold text-white">
+						<h3 className="text-lg font-semibold text-black">
 							{title || widget.title || "Price Chart"}
 						</h3>
 					</div>
@@ -640,6 +671,17 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 					</Dropdown>
 
 					{/* Action Buttons */}
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={handleRefreshData}
+						disabled={loading}
+						className="text-slate-400 hover:text-white h-8 w-8 p-0"
+						title="Refresh Data"
+					>
+						<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+					</Button>
+
 					{onSettings && (
 						<Button
 							variant="ghost"
@@ -668,13 +710,13 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 			{stats && (
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-3 bg-slate-800/50 rounded-lg">
 					<div className="text-center">
-						<div className="text-xs text-slate-400 mb-1">Current</div>
-						<div className="text-sm font-medium text-white">
+						<div className="text-xs text-black mb-1">Current</div>
+						<div className="text-sm font-medium text-black">
 							{formatValue(stats.current, chartData[0]?.index_value !== undefined ? "number" : "currency")}
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="text-xs text-slate-400 mb-1">Change</div>
+						<div className="text-xs text-black mb-1">Change</div>
 						<div className={`text-sm font-medium flex items-center justify-center gap-1`}
 							 style={{ color: getChangeColor(stats.change) }}>
 							{stats.change > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -682,14 +724,14 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="text-xs text-slate-400 mb-1">High</div>
-						<div className="text-sm font-medium text-green-400">
+						<div className="text-xs text-black mb-1">High</div>
+						<div className="text-sm font-medium text-black">
 							{formatValue(stats.high, chartData[0]?.index_value !== undefined ? "number" : "currency")}
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="text-xs text-slate-400 mb-1">Low</div>
-						<div className="text-sm font-medium text-red-400">
+						<div className="text-xs text-black mb-1">Low</div>
+						<div className="text-sm font-medium text-black">
 							{formatValue(stats.low, chartData[0]?.index_value !== undefined ? "number" : "currency")}
 						</div>
 					</div>
@@ -702,7 +744,7 @@ export default function ChartWidget({ widget, dragHandleProps, onSettings, onRem
 			</div>
 
 			{/* Chart Info Summary */}
-			<div className="flex items-center justify-center gap-2 py-2 text-xs text-slate-400">
+			<div className="flex items-center justify-center gap-2 py-2 text-xs text-black">
 				<span className="capitalize">{timeframe} View</span>
 				<span>•</span>
 				<span>{chartData.length} data points</span>

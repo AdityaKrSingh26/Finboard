@@ -17,6 +17,17 @@ export default function WidgetRenderer({ widget, searchQuery = "", dragHandlePro
 
 	// Handle data processing based on widget config
 	const processWidgetData = (widget) => {
+		console.log("🔧 Widget Renderer Debug:", {
+			widgetId: widget.id,
+			widgetTitle: widget.title,
+			dataSource: widget.config?.dataSource,
+			hasData: !!widget.data,
+			dataType: typeof widget.data,
+			isArray: Array.isArray(widget.data),
+			dataLength: widget.data?.length,
+			firstDataItem: widget.data?.[0]
+		})
+
 		if (!widget?.data) return null
 
 		const { data, config } = widget
