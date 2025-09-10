@@ -22,7 +22,7 @@ import {
 	Search
 } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
-import { testApiConnection, selectApiTestResult, selectApiTesting, clearApiTestResult } from "@/lib/store/slices/widgets-slice"
+import { testApiConnectionThunk, selectApiTestResult, selectApiTesting, clearApiTestResult } from "@/lib/store/slices/widgets-slice"
 
 // Simple data sources configuration
 const dataSources = {
@@ -186,7 +186,7 @@ export default function AddWidgetModal({ isOpen, onClose, onCreateWidget }) {
 		}
 		
 		if (url) {
-			dispatch(testApiConnection({ url }))
+			dispatch(testApiConnectionThunk({ url }))
 		}
 	}
 

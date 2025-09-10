@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { DataService } from "@/lib/data-service"
+import { fetchData, testApiConnection } from "@/lib/data-service"
 import { getOptimizedConfig } from "@/lib/widget-configs"
 
 // Async thunk for fetching widget data
@@ -7,7 +7,7 @@ export const fetchWidgetData = createAsyncThunk(
 	"widgets/fetchData",
 	async ({ widgetId, config }, { rejectWithValue }) => {
 		try {
-			const data = await DataService.fetchData(config.dataSource, config)
+			const data = await fetchData(config.dataSource, config)
 			return { widgetId, data }
 		} catch (error) {
 			console.error(`❌ fetchWidgetData error for widget ${widgetId}:`, error.message)
@@ -17,11 +17,11 @@ export const fetchWidgetData = createAsyncThunk(
 )
 
 // Async thunk for testing API connections
-export const testApiConnection = createAsyncThunk(
+export const testApiConnectionThunk = createAsyncThunk(
 	"widgets/testApi",
 	async ({ url }, { rejectWithValue }) => {
 		try {
-			const result = await DataService.testApiConnection(url)
+			const result = await testApiConnection(url)
 			return result
 		} catch (error) {
 			return rejectWithValue(error.message)
@@ -307,15 +307,15 @@ const widgetsSlice = createSlice({
 					widget.error = error || "Failed to fetch data"
 				}
 			})
-			.addCase(testApiConnection.pending, (state) => {
+			.addCase(testApiConnectionThunk.pending, (state) => {
 				state.apiTesting = true
 				state.apiTestResult = null
 			})
-			.addCase(testApiConnection.fulfilled, (state, action) => {
+			.addCase(testApiConnectionThunk.fulfilled, (state, action) => {
 				state.apiTesting = false
 				state.apiTestResult = action.payload
 			})
-			.addCase(testApiConnection.rejected, (state, action) => {
+			.addCase(testApiConnectionThunk.rejected, (state, action) => {
 				state.apiTesting = false
 				state.apiTestResult = {
 					success: false,
